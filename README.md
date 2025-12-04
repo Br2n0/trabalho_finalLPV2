@@ -1,98 +1,91 @@
 # trabalho_finalLPV2
+
 Trabalho Final da disciplina de Linguagem de Programação Visual II
 
-Documento de Requisitos do Sistema (DRS) — Catálogo de Filmes + Previsão do Tempo
+## Documento de Requisitos do Sistema (DRS) — Catálogo de Filmes + Previsão do Tempo
+
 Integrações: TMDb + Open-Meteo
 Plataforma: ASP.NET Core 8+ (MVC)
 Equipes: Duplas
 Versão: 1.5
 Data: 26/11/2025
 
-1. Visão Geral
+## 1. Visão Geral
+
 Desenvolver uma aplicação MVC em ASP.NET Core 8+ que:
 
-Pesquise filmes no TMDb,
-
-Importe títulos selecionados para uma base local,
-
-Gerencie um catálogo de filmes (CRUD),
-
-Exiba detalhes enriquecidos (poster, sinopse, elenco, nota),
-
-Mostre a previsão do tempo da cidade associada ao filme utilizando a API Open-Meteo,
-
-Exporte o catálogo local para CSV/Excel.
+- Pesquise filmes no TMDb,
+- Importe títulos selecionados para uma base local,
+- Gerencie um catálogo de filmes (CRUD),
+- Exiba detalhes enriquecidos (poster, sinopse, elenco, nota),
+- Mostre a previsão do tempo da cidade associada ao filme utilizando a API Open-Meteo,
+- Exporte o catálogo local para CSV/Excel.
 
 O projeto também exige workflow Git profissional: branches individuais e PRs obrigatórios.
 
-2. Escopo do Sistema
+## 2. Escopo do Sistema
+
 A aplicação deverá:
 
-Realizar buscas no TMDb.
+- Realizar buscas no TMDb.
+- Importar dados selecionados do TMDb para armazenamento local.
+- Gerenciar filmes (CRUD completo).
+- Exibir poster via URL fornecida por /configuration do TMDb.
+- Integrar previsão do tempo da cidade vinculada ao filme via Open-Meteo.
+- Exibir previsão mínima e máxima diária.
+- Exportar o catálogo local.
+- Usar partial views reutilizáveis.
+- Seguir rigorosamente o fluxo Git/PRs.
 
-Importar dados selecionados do TMDb para armazenamento local.
+## 3. Requisitos Funcionais (RF)
 
-Gerenciar filmes (CRUD completo).
+### RF01 — Entidade Filme (obrigatório)
 
-Exibir poster via URL fornecida por /configuration do TMDb.
-
-Integrar previsão do tempo da cidade vinculada ao filme via Open-Meteo.
-
-Exibir previsão mínima e máxima diária.
-
-Exportar o catálogo local.
-
-Usar partial views reutilizáveis.
-
-Seguir rigorosamente o fluxo Git/PRs.
-
-3. Requisitos Funcionais (RF)
-RF01 — Entidade Filme (obrigatório)
 A entidade local deve conter:
 Id, TmdbId, Titulo, TituloOriginal, Sinopse, DataLancamento, Genero, PosterPath, Lingua, Duracao, NotaMedia, ElencoPrincipal, CidadeReferencia, Latitude, Longitude, DataCriacao, DataAtualizacao.
 
-RF02 — Busca de filmes (server-side)
+### RF02 — Busca de filmes (server-side)
+
 Deve consumir /search/movie do TMDb.
 
 Resultados exibidos em página server-side, com paginação TMDb.
 
-Deve permitir botão “Importar”.
+Deve permitir botão "Importar".
 
-RF03 — Importação de filme
+### RF03 — Importação de filme
+
 Persistir filme localmente após mapear DTO → Model.
 
 Coordenadas geográficas (lat/long) devem vir do TMDb (quando possível) ou inseridas manualmente pelo usuário.
 
-RF04 — Exibição de detalhes (TMDb)
+### RF04 — Exibição de detalhes (TMDb)
+
 Consultar /movie/{id} e /configuration quando necessário.
 
 Montar URL final do poster com base_url + tamanho + poster_path.
 
 Exibir poster e dados completos do filme.
 
-RF05 — Cliente TMDb desacoplado
+### RF05 — Cliente TMDb desacoplado
+
 Criar:
 
-ITmdbApiService (interface)
-
-TmdbApiService (implementação)
+- ITmdbApiService (interface)
+- TmdbApiService (implementação)
 
 Métodos obrigatórios:
 
-SearchMoviesAsync
+- SearchMoviesAsync
+- GetMovieDetailsAsync
+- GetMovieImagesAsync
+- GetConfigurationAsync
 
-GetMovieDetailsAsync
+### RF06 — Integração com previsão do tempo (Open-Meteo)
 
-GetMovieImagesAsync
-
-GetConfigurationAsync
-
-RF06 — Integração com previsão do tempo (Open-Meteo)
 Criar:
 
-Interface IWeatherApiService
-
-Implementação WeatherApiService
+- Interface IWeatherApiService
+- Implementação WeatherApiService
 
 Consumir o endpoint:
 
@@ -101,131 +94,112 @@ https://api.open-meteo.com/v1/forecast
     &longitude={lon}
     &daily=temperature_2m_max,temperature_2m_min
     &timezone=auto
+
 Exibir na tela de detalhes:
 
-Temperatura mínima do dia
-
-Temperatura máxima do dia
-
-Data da previsão
+- Temperatura mínima do dia
+- Temperatura máxima do dia
+- Data da previsão
 
 Caso o filme não tenha lat/long, exibir instrução para o usuário preencher.
 
-RF07 — Autenticação TMDb
+### RF07 — Autenticação TMDb
+
 Deve suportar API Key v3 ou Bearer Token v4.
 
 Segredos não podem ser commitados.
 
 (Open-Meteo não exige autenticação.)
 
-RF08 — Cache obrigatório
+### RF08 — Cache obrigatório
+
 Usar IMemoryCache para armazenar:
 
-Configuração do TMDb (obrigatório)
+- Configuração do TMDb (obrigatório)
+- Buscas TMDb (TTL 5 min)
+- Detalhes TMDb (TTL 10 min)
+- Previsão do tempo por lat/long (TTL 10 min)
 
-Buscas TMDb (TTL 5 min)
+### RF09 — Tratamento de erros e logs
 
-Detalhes TMDb (TTL 10 min)
-
-Previsão do tempo por lat/long (TTL 10 min)
-
-RF09 — Tratamento de erros e logs
 Registrar em log:
 
-Endpoint consultado
-
-Parâmetros enviados
-
-Status code
-
-Data/hora
-
-Mensagem de erro
+- Endpoint consultado
+- Parâmetros enviados
+- Status code
+- Data/hora
+- Mensagem de erro
 
 Exibir mensagens amigáveis no frontend.
 
-RF10 — Partial Views
+### RF10 — Partial Views
+
 Criar e usar Partial Views reutilizáveis para:
 
-cards/listagens
-
-bloco de previsão do tempo
+- cards/listagens
+- bloco de previsão do tempo
 
 Deve haver reutilização em pelo menos duas telas.
 
-RF11 — Persistência local (sem migrations)
+### RF11 — Persistência local (sem migrations)
+
 Persistência local sem migrations — ou seja:
 
-O banco pode ser criado manualmente pelo aluno,
-
-Ou o aluno pode usar um banco extremamente simples como SQLite com criação de tabelas manual,
-
-Ou outro mecanismo de persistência à escolha, DESDE QUE seja permanente e funcional (não pode ser InMemory).
+- O banco pode ser criado manualmente pelo aluno,
+- Ou o aluno pode usar um banco extremamente simples como SQLite com criação de tabelas manual,
+- Ou outro mecanismo de persistência à escolha, DESDE QUE seja permanente e funcional (não pode ser InMemory).
 
 Criar interface:
 
-IFilmeRepository
+- IFilmeRepository
 
 Criar implementação concreta.
 
 Operações obrigatórias: Create, Read, Update, Delete, List, GetById.
 
-RF12 — Exportação (obrigatória)
+### RF12 — Exportação (obrigatória)
+
 Exportar catálogo para CSV e Excel via FileResult.
 
-RF13 — Paginação externa TMDb
+### RF13 — Paginação externa TMDb
+
 Utilizar o parâmetro page da API.
 
 Exibir exatamente os resultados e numeração retornados pela API.
 
-4. Hard Requirements (Obrigatórios)
+## 4. Hard Requirements (Obrigatórios)
+
 A entrega só será aceita se TODOS os itens estiverem presentes:
 
-ASP.NET Core 8+ funcionando.
+- ASP.NET Core 8+ funcionando.
+- CRUD completo de filmes.
+- Integração TMDb: /search/movie, /movie/{id}, /movie/{id}/images, /configuration.
+- Integração Open-Meteo funcional na tela de detalhes.
+- Persistência local real (qualquer tecnologia) sem migrations.
+- Partial Views reutilizáveis.
+- Cache obrigatório via IMemoryCache (TMDb + Open-Meteo).
+- Exportação CSV e Excel.
+- Logs detalhados.
+- Segredos TMDb fora do repositório.
+- Workflow Git obrigatório (branches individuais + PRs).
+- README completo.
 
-CRUD completo de filmes.
+## 5. Critérios de Aceitação
 
-Integração TMDb: /search/movie, /movie/{id}, /movie/{id}/images, /configuration.
+- Busca TMDb funcionando com paginação.
+- Importação salva filme localmente com dados completos.
+- Poster exibido corretamente via configuração TMDb.
+- Previsão do tempo exibida corretamente com dados do Open-Meteo.
+- Cache reduz chamadas (verificável via logs).
+- Exportação gera arquivos CSV e Excel válidos.
+- Partial Views reutilizadas.
+- Branch main executa sem ajustes.
+- Cada aluno possui 3 PRs aprovados ou mais.
 
-Integração Open-Meteo funcional na tela de detalhes.
+## 6. Workflow Git / PRs (obrigatório)
 
-Persistência local real (qualquer tecnologia) sem migrations.
+### 6.1 — Branches Individuais
 
-Partial Views reutilizáveis.
-
-Cache obrigatório via IMemoryCache (TMDb + Open-Meteo).
-
-Exportação CSV e Excel.
-
-Logs detalhados.
-
-Segredos TMDb fora do repositório.
-
-Workflow Git obrigatório (branches individuais + PRs).
-
-README completo.
-
-5. Critérios de Aceitação
-Busca TMDb funcionando com paginação.
-
-Importação salva filme localmente com dados completos.
-
-Poster exibido corretamente via configuração TMDb.
-
-Previsão do tempo exibida corretamente com dados do Open-Meteo.
-
-Cache reduz chamadas (verificável via logs).
-
-Exportação gera arquivos CSV e Excel válidos.
-
-Partial Views reutilizadas.
-
-Branch main executa sem ajustes.
-
-Cada aluno possui 3 PRs aprovados ou mais.
-
-6. Workflow Git / PRs (obrigatório)
-6.1 — Branches Individuais
 Cada aluno deve trabalhar apenas em sua própria branch, seguindo o padrão:
 
 feature/<nome>-<descricao>
@@ -233,48 +207,40 @@ ou
 
 feature/<matricula>-<descricao>
 
-6.2 — Pull Requests (PRs)
+### 6.2 — Pull Requests (PRs)
+
 Toda alteração deve ser integrada via PR para main.
 
 Merge direto na main é proibido.
 
 Cada PR deve conter:
 
-título claro
+- título claro
+- descrição objetiva
+- arquivos alterados
+- o que foi implementado
 
-descrição objetiva
+### 6.3 — Mínimo obrigatório de PRs
 
-arquivos alterados
-
-o que foi implementado
-
-6.3 — Mínimo obrigatório de PRs
 Cada aluno deve ter no mínimo 3 PRs aprovados no repositório.
 
 PRs aceitos: features, correções, documentação, refatorações.
 PRs que NÃO contam: vazios, triviais ou automáticos.
 
-6.4 — Entrega final
+### 6.4 — Entrega final
+
 A branch main será usada como validação final. Ela deve:
 
-compilar
+- compilar
+- rodar
+- não conter segredos
+- ter persistência funcionando
+- estar estável e limpa
 
-rodar
+## 7. Entregáveis
 
-não conter segredos
-
-ter persistência funcionando
-
-estar estável e limpa
-
-7. Entregáveis
-Repositório Git com branches individuais.
-
-PRs (mínimo 3 por aluno).
-
-Código ASP.NET Core 8+ completo.
-
-Persistência local funcional.
-
-README com instruções.
-
+- Repositório Git com branches individuais.
+- PRs (mínimo 3 por aluno).
+- Código ASP.NET Core 8+ completo.
+- Persistência local funcional.
+- README com instruções.
