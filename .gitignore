@@ -171,3 +171,6 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# User secrets - arquivos de configuração com dados sensíveis
+appsettings.Development.json

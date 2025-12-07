@@ -1,9 +1,15 @@
+using CatalogoFilmesMeteo.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddMemoryCache();
 builder.Services.AddHttpClient();
+
+// Registrar serviços de API
+builder.Services.AddScoped<IServicoTmdbApi, ServicoTmdbApi>();
+builder.Services.AddScoped<IServicoApiTempo, ServicoApiTempo>();
 
 var app = builder.Build();
 
