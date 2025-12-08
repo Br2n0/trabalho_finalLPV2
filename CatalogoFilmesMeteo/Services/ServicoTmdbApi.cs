@@ -23,13 +23,11 @@ public class ServicoTmdbApi : IServicoTmdbApi
         _cache = cache;
         _logger = logger;
         
-        // Prioridade: appsettings.Development.json > variável de ambiente > chave demo (fallback)
-        // NOTA: Por ser projeto acadêmico, estamos usando uma chave demo hardcoded como fallback
         // para facilitar a execução do projeto sem necessidade de configuração manual.
-        // Em produção, isso NÃO deve ser feito - sempre use segredos adequados.
+        // Em produção de verdade nao faria assim 
         _apiKey = configuration["Tmdb:ApiKey"] 
                   ?? Environment.GetEnvironmentVariable("TMDB_API_KEY")
-                  ?? "af717ba3966e7fa1a21fd07060aac165"; // Chave demo para facilitar execução acadêmica
+                  ?? "af717ba3966e7fa1a21fd07060aac165"; 
     }
 
     public async Task<RespostaBuscaTmdb> BuscarFilmesAsync(string consulta, int pagina)
