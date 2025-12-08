@@ -1,3 +1,4 @@
+using CatalogoFilmesMeteo.Repositories;
 using CatalogoFilmesMeteo.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,9 +8,14 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddMemoryCache();
 builder.Services.AddHttpClient();
 
-// Registrar serviços de API
+// Registrar serviços de API externas
 builder.Services.AddScoped<IServicoTmdbApi, ServicoTmdbApi>();
 builder.Services.AddScoped<IServicoApiTempo, ServicoApiTempo>();
+
+// Registrar repositório e serviços de negócio
+builder.Services.AddScoped<IFilmeRepository, FilmeRepository>();
+builder.Services.AddScoped<IFilmeImportService, FilmeImportService>();
+builder.Services.AddScoped<IExportService, ExportService>();
 
 var app = builder.Build();
 
