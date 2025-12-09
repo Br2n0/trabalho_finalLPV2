@@ -10,7 +10,7 @@ public class ServicoApiTempo : IServicoApiTempo
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IMemoryCache _cache;
     private readonly ILogger<ServicoApiTempo> _logger;
-    private const string BaseUrl = "https://api.open-meteo.com/v1/forecast";
+    private const string BaseUrl = "https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&hourly=temperature_2m";
 
     public ServicoApiTempo(
         IHttpClientFactory httpClientFactory,
