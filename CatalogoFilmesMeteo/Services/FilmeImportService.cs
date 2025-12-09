@@ -1,6 +1,7 @@
 using CatalogoFilmesMeteo.Models;
 using CatalogoFilmesMeteo.Models.DTOs;
 using CatalogoFilmesMeteo.Repositories;
+using Microsoft.Extensions.Logging;
 
 namespace CatalogoFilmesMeteo.Services;
 
@@ -13,13 +14,16 @@ namespace CatalogoFilmesMeteo.Services;
 public class FilmeImportService : IFilmeImportService
 {
     private readonly IFilmeRepository _filmeRepository;
+    private readonly IServicoTmdbApi _tmdbService;
     private readonly ILogger<FilmeImportService> _logger;
 
     public FilmeImportService(
         IFilmeRepository filmeRepository,
+        IServicoTmdbApi tmdbService,
         ILogger<FilmeImportService> logger)
     {
         _filmeRepository = filmeRepository;
+        _tmdbService = tmdbService;
         _logger = logger;
     }
 
@@ -30,14 +34,14 @@ public class FilmeImportService : IFilmeImportService
 
         try
         {
-            _logger.LogInformation("Iniciando importação do filme: {Titulo} (TmdbId: {Id})", 
+            _logger.LogInformation("Iniciando importação do filme: {Titulo} (TmdbId: {Id})",
                 detalhesTmdb.Titulo, detalhesTmdb.Id);
 
             // Verifica se o filme já existe no banco (evita duplicatas)
             var filmeExistente = await _filmeRepository.GetByTmdbIdAsync(detalhesTmdb.Id);
             if (filmeExistente != null)
             {
-                _logger.LogWarning("Filme já existe no banco: Id={Id}, TmdbId={TmdbId}", 
+                _logger.LogWarning("Filme já existe no banco: Id={Id}, TmdbId={TmdbId}",
                     filmeExistente.Id, detalhesTmdb.Id);
                 throw new InvalidOperationException(
                     $"Filme '{detalhesTmdb.Titulo}' já foi importado anteriormente.");
@@ -49,7 +53,7 @@ public class FilmeImportService : IFilmeImportService
             // Salva no banco de dados
             var filmeSalvo = await _filmeRepository.CreateAsync(filme);
 
-            _logger.LogInformation("Filme importado com sucesso: Id={Id}, Titulo={Titulo}", 
+            _logger.LogInformation("Filme importado com sucesso: Id={Id}, Titulo={Titulo}",
                 filmeSalvo.Id, filmeSalvo.Titulo);
 
             return filmeSalvo;
@@ -62,6 +66,36 @@ public class FilmeImportService : IFilmeImportService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Erro ao importar filme: {Titulo}", detalhesTmdb.Titulo);
+            throw;
+        }
+    }
+
+    public async Task<Filme> ImportarFilmeAsync(int tmdbId, string? cidade, decimal? latitude, decimal? longitude)
+    {
+        try
+        {
+            // Obtém os detalhes do filme do TMDb
+            var detalhesTmdb = await _tmdbService.ObterDetalhesFilmeAsync(tmdbId);
+
+            // Importa o filme
+            var filme = await ImportarFilmeAsync(detalhesTmdb);
+
+            // Atualiza a localização, se fornecida
+            if (!string.IsNullOrEmpty(cidade) || latitude.HasValue || longitude.HasValue)
+            {
+                filme.CidadeReferencia = cidade;
+                filme.Latitude = latitude;
+                filme.Longitude = longitude;
+                filme.DataAtualizacao = DateTime.Now;
+
+                await _filmeRepository.UpdateAsync(filme);
+            }
+
+            return filme;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erro ao importar filme por TmdbId: {TmdbId}", tmdbId);
             throw;
         }
     }
@@ -84,22 +118,22 @@ public class FilmeImportService : IFilmeImportService
             PosterPath = detalhesTmdb.CaminhoPoster,
             Duracao = detalhesTmdb.Duracao,
             NotaMedia = detalhesTmdb.MediaVotos > 0 ? detalhesTmdb.MediaVotos : null,
-            
+
             // Data de lançamento: vem como string "yyyy-MM-dd", converte para DateTime
             DataLancamento = !string.IsNullOrEmpty(detalhesTmdb.DataLancamento)
                 ? DateTime.TryParse(detalhesTmdb.DataLancamento, out var data) ? data : null
                 : null,
-            
+
             // Gêneros: vem como lista, pegamos o primeiro ou concatenamos
             Genero = detalhesTmdb.Generos?.Any() == true
                 ? string.Join(", ", detalhesTmdb.Generos.Select(g => g.Nome))
                 : null,
-            
+
             // Idioma: vem como lista, pegamos o primeiro ou concatenamos
             Lingua = detalhesTmdb.Idiomas?.Any() == true
                 ? string.Join(", ", detalhesTmdb.Idiomas.Select(i => i.Nome))
                 : null,
-            
+
             // Elenco principal: pega os primeiros 5 atores do cast
             ElencoPrincipal = detalhesTmdb.Creditos?.Elenco?
                 .OrderBy(e => e.Ordem)
@@ -108,20 +142,20 @@ public class FilmeImportService : IFilmeImportService
                 .ToList() is { Count: > 0 } elenco
                 ? string.Join(", ", elenco)
                 : null,
-            
+
             // Coordenadas: deixamos null na importação
             // O usuário pode preencher depois manualmente
             Latitude = null,
             Longitude = null,
             CidadeReferencia = null,
-            
+
             // Timestamps: data atual
             DataCriacao = DateTime.Now,
             DataAtualizacao = DateTime.Now
         };
 
-        _logger.LogDebug("Mapeamento concluído: {Titulo} -> {Genero}, {Lingua}, {ElencoCount} atores", 
-            filme.Titulo, filme.Genero, filme.Lingua, 
+        _logger.LogDebug("Mapeamento concluído: {Titulo} -> {Genero}, {Lingua}, {ElencoCount} atores",
+            filme.Titulo, filme.Genero, filme.Lingua,
             detalhesTmdb.Creditos?.Elenco?.Count ?? 0);
 
         return filme;

@@ -32,14 +32,9 @@ public class FilmeController : Controller
     {
         try
         {
-            // Busca todos os filmes cadastrados no banco de dados
             var filmes = await _filmeRepository.ListAsync();
-            
-            // Gera o arquivo CSV usando o serviço de exportação
             var bytes = await _exportService.ExportToCsvAsync(filmes);
-            
-            // Retorna FileResult que faz o download do arquivo
-            // O nome do arquivo inclui data/hora para evitar conflitos
+
             return File(
                 fileContents: bytes,
                 contentType: "text/csv",
@@ -50,7 +45,7 @@ public class FilmeController : Controller
         {
             _logger.LogError(ex, "Erro ao exportar filmes para CSV");
             TempData["ErrorMessage"] = "Erro ao exportar catálogo para CSV. Tente novamente.";
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Gerenciar");
         }
     }
 
@@ -62,14 +57,9 @@ public class FilmeController : Controller
     {
         try
         {
-            // Busca todos os filmes cadastrados no banco de dados
             var filmes = await _filmeRepository.ListAsync();
-            
-            // Gera o arquivo Excel usando o serviço de exportação
             var bytes = await _exportService.ExportToExcelAsync(filmes);
-            
-            // Retorna FileResult que faz o download do arquivo
-            // O nome do arquivo inclui data/hora para evitar conflitos
+
             return File(
                 fileContents: bytes,
                 contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -80,7 +70,7 @@ public class FilmeController : Controller
         {
             _logger.LogError(ex, "Erro ao exportar filmes para Excel");
             TempData["ErrorMessage"] = "Erro ao exportar catálogo para Excel. Tente novamente.";
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Gerenciar");
         }
     }
 }
