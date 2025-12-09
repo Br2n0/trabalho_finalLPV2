@@ -1,100 +1,348 @@
 @model CatalogoFilmesMeteo.Models.Filme
+@inject CatalogoFilmesMeteo.Services.IServicoTmdbApi TmdbService
+@inject CatalogoFilmesMeteo.Services.IServicoApiTempo TempoService
 
 @{
-    ViewData["Title"] = "Confirmar Exclusão";
-    var posterUrl = ViewBag.PosterUrl as string;
+    ViewData["Title"] = "Detalhes do Filme";
+    var posterUrl = TmdbService.ConstruirUrlPoster(Model.PosterPath, "w500");
+    var previsaoTempo = Model.Latitude.HasValue && Model.Longitude.HasValue
+    ? await TempoService.ObterPrevisaoDiariaAsync(Model.Latitude.Value, Model.Longitude.Value)
+    : null;
 }
 
 <div class="mb-4">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item">
-                <a asp-action="Index">
-                    <i class="fas fa-home me-1"></i>Catálogo
+                <a asp-controller="Home" asp-action="Index">
+                    <i class="fas fa-home me-1"></i>Início
                 </a>
             </li>
             <li class="breadcrumb-item">
-                <a asp-action="Detalhes" asp-route-id="@Model.Id">@Model.Titulo</a>
+                <a asp-controller="Gerenciar" asp-action="Index">Catálogo</a>
             </li>
-            <li class="breadcrumb-item active">Deletar</li>
+            <li class="breadcrumb-item active">@Model.Titulo</li>
         </ol>
     </nav>
 </div>
 
-<div class="row justify-content-center">
-    <div class="col-lg-6">
-        <div class="card shadow border-0">
-            <div class="card-header bg-danger text-white">
+<div class="row">
+    <div class="col-lg-4 mb-4">
+        <div class="card shadow-lg border-0 animate-on-hover">
+            <div class="card-img-wrapper">
+                <img src="@posterUrl" class="card-img-top rounded-top" alt="@Model.Titulo"
+                    onerror="this.src='/images/no-poster.png'" style="max-height: 500px; object-fit: cover;">
+                @if (Model.NotaMedia.HasValue)
+                {
+                    <div class="rating-badge position-absolute top-0 end-0 m-3">
+                        <i class="fas fa-star me-1"></i>@Model.NotaMedia.Value.ToString("F1")
+                    </div>
+                }
+            </div>
+            <div class="card-body">
+                <h5 class="card-title text-gradient-primary">@Model.Titulo</h5>
+                <div class="d-grid gap-2">
+                    <a asp-action="Editar" asp-route-id="@Model.Id" class="btn btn-primary btn-gradient mb-2">
+                        <i class="fas fa-edit me-2"></i>Editar Filme
+                    </a>
+                    <a asp-action="Deletar" asp-route-id="@Model.Id" class="btn btn-outline-danger mb-2">
+                        <i class="fas fa-trash me-2"></i>Excluir Filme
+                    </a>
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Voltar para Início
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card shadow-lg border-0 h-100">
+            <div class="card-header bg-primary text-white">
                 <h4 class="mb-0">
-                    <i class="fas fa-exclamation-triangle me-2"></i>Confirmar Exclusão
+                    <i class="fas fa-info-circle me-2"></i>Informações do Filme
                 </h4>
             </div>
             <div class="card-body">
-                <div class="alert alert-danger">
-                    <i class="fas fa-exclamation-circle me-2"></i>
-                    <strong>Atenção!</strong> Esta ação não pode ser desfeita.
-                </div>
-                
-                <div class="text-center mb-4">
-                    <img src="@posterUrl" 
-                         alt="@Model.Titulo" 
-                         class="img-fluid rounded shadow-sm"
-                         onerror="this.src='/images/no-poster.png'"
-                         style="max-height: 400px;">
-                </div>
-                
-                <h5 class="text-center mb-3">Tem certeza que deseja remover este filme do catálogo?</h5>
-                
-                <div class="card bg-light">
-                    <div class="card-body">
-                        <dl class="row mb-0">
-                            <dt class="col-sm-4">Título:</dt>
-                            <dd class="col-sm-8">@Model.Titulo</dd>
-                            
-                            @if (!string.IsNullOrEmpty(Model.TituloOriginal) && Model.TituloOriginal != Model.Titulo)
-                            {
-                                <dt class="col-sm-4">Título Original:</dt>
-                                <dd class="col-sm-8">@Model.TituloOriginal</dd>
-                            }
-                            
-                            @if (Model.DataLancamento.HasValue)
-                            {
-                                <dt class="col-sm-4">Lançamento:</dt>
-                                <dd class="col-sm-8">@Model.DataLancamento.Value.ToString("dd/MM/yyyy")</dd>
-                            }
-                            
-                            @if (!string.IsNullOrEmpty(Model.Genero))
-                            {
-                                <dt class="col-sm-4">Gênero:</dt>
-                                <dd class="col-sm-8">@Model.Genero</dd>
-                            }
-                            
-                            @if (Model.NotaMedia.HasValue)
-                            {
-                                <dt class="col-sm-4">Nota:</dt>
-                                <dd class="col-sm-8">
-                                    <span class="badge bg-warning text-dark">
-                                        <i class="fas fa-star"></i> @Model.NotaMedia.Value.ToString("F1")
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="info-item mb-3">
+                            <h6 class="text-muted mb-1">
+                                <i class="fas fa-language me-2"></i>Título Original
+                            </h6>
+                            <p class="fs-5">@Model.TituloOriginal</p>
+                        </div>
+
+                        <div class="info-item mb-3">
+                            <h6 class="text-muted mb-1">
+                                <i class="fas fa-calendar me-2"></i>Data de Lançamento
+                            </h6>
+                            <p class="fs-5">
+                                @if (Model.DataLancamento.HasValue)
+                                {
+                                    @Model.DataLancamento.Value.ToString("dd/MM/yyyy")
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Não informado</span>
+                                }
+                            </p>
+                        </div>
+
+                        <div class="info-item mb-3">
+                            <h6 class="text-muted mb-1">
+                                <i class="fas fa-clock me-2"></i>Duração
+                            </h6>
+                            <p class="fs-5">
+                                @if (Model.Duracao.HasValue)
+                                {
+                                    @($"{Model.Duracao} minutos")
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Não informado</span>
+                                }
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="info-item mb-3">
+                            <h6 class="text-muted mb-1">
+                                <i class="fas fa-tags me-2"></i>Gênero
+                            </h6>
+                            <p class="fs-5">
+                                @if (!string.IsNullOrEmpty(Model.Genero))
+                                {
+                                    @Model.Genero
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Não informado</span>
+                                }
+                            </p>
+                        </div>
+
+                        <div class="info-item mb-3">
+                            <h6 class="text-muted mb-1">
+                                <i class="fas fa-globe me-2"></i>Idioma
+                            </h6>
+                            <p class="fs-5">
+                                @if (!string.IsNullOrEmpty(Model.Lingua))
+                                {
+                                    @Model.Lingua
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Não informado</span>
+                                }
+                            </p>
+                        </div>
+
+                        <div class="info-item mb-3">
+                            <h6 class="text-muted mb-1">
+                                <i class="fas fa-star me-2"></i>Avaliação
+                            </h6>
+                            <p class="fs-5">
+                                @if (Model.NotaMedia.HasValue)
+                                {
+                                    <span class="badge bg-warning text-dark fs-6">
+                                        <i class="fas fa-star me-1"></i>@Model.NotaMedia.Value.ToString("F1")/10
                                     </span>
-                                </dd>
-                            }
-                        </dl>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Não avaliado</span>
+                                }
+                            </p>
+                        </div>
                     </div>
                 </div>
-                
-                <form asp-action="Deletar" method="post" class="mt-4">
-                    <input type="hidden" asp-for="Id" />
-                    
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                        <a asp-action="Detalhes" asp-route-id="@Model.Id" class="btn btn-secondary btn-lg">
-                            <i class="fas fa-arrow-left me-2"></i>Cancelar
-                        </a>
-                        <button type="submit" class="btn btn-danger btn-lg">
-                            <i class="fas fa-trash me-2"></i>Sim, Remover Filme
-                        </button>
+
+                <div class="info-item mb-4">
+                    <h6 class="text-muted mb-2">
+                        <i class="fas fa-book-open me-2"></i>Sinopse
+                    </h6>
+                    <div class="card bg-light border-0 p-3">
+                        <p class="mb-0">
+                            @if (!string.IsNullOrEmpty(Model.Sinopse))
+                            {
+                                @Model.Sinopse
+                            }
+                            else
+                            {
+                                <span class="text-muted">Sinopse não disponível.</span>
+                            }
+                        </p>
                     </div>
-                </form>
+                </div>
+
+                <div class="info-item mb-4">
+                    <h6 class="text-muted mb-2">
+                        <i class="fas fa-users me-2"></i>Elenco Principal
+                    </h6>
+                    <div class="card bg-light border-0 p-3">
+                        <p class="mb-0">
+                            @if (!string.IsNullOrEmpty(Model.ElencoPrincipal))
+                            {
+                                @Model.ElencoPrincipal
+                            }
+                            else
+                            {
+                                <span class="text-muted">Elenco não disponível.</span>
+                            }
+                        </p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="info-item">
+                            <h6 class="text-muted mb-2">
+                                <i class="fas fa-map-marker-alt me-2"></i>Localização
+                            </h6>
+                            <div class="card bg-light border-0 p-3">
+                                <p class="mb-1">
+                                    <strong>Cidade:</strong>
+                                    @if (!string.IsNullOrEmpty(Model.CidadeReferencia))
+                                    {
+                                        @Model.CidadeReferencia
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Não informada</span>
+                                    }
+                                </p>
+                                <p class="mb-0">
+                                    <strong>Coordenadas:</strong>
+                                    @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
+                                    {
+                                        @($"{Model.Latitude.Value:F6}, {Model.Longitude.Value:F6}")
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Não informadas</span>
+                                    }
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="info-item">
+                            <h6 class="text-muted mb-2">
+                                <i class="fas fa-database me-2"></i>Informações Técnicas
+                            </h6>
+                            <div class="card bg-light border-0 p-3">
+                                <p class="mb-1">
+                                    <strong>ID TMDb:</strong> @Model.TmdbId
+                                </p>
+                                <p class="mb-1">
+                                    <strong>Criado em:</strong> @Model.DataCriacao.ToString("dd/MM/yyyy HH:mm")
+                                </p>
+                                <p class="mb-0">
+                                    <strong>Atualizado em:</strong> @Model.DataAtualizacao.ToString("dd/MM/yyyy HH:mm")
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+@if (Model.Latitude.HasValue && Model.Longitude.HasValue && previsaoTempo != null)
+{
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-cloud-sun me-2"></i>Previsão do Tempo para @Model.CidadeReferencia
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <partial name="_PrevisaoTempo" model="previsaoTempo" />
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else if (Model.Latitude.HasValue && Model.Longitude.HasValue)
+{
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-cloud-sun me-2"></i>Previsão do Tempo
+                    </h5>
+                </div>
+                <div class="card-body text-center py-4">
+                    <i class="fas fa-exclamation-triangle fa-2x text-warning mb-3"></i>
+                    <p class="text-muted mb-3">
+                        Não foi possível carregar a previsão do tempo no momento.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow-lg border-0">
+                <div class="card-body text-center py-4">
+                    <i class="fas fa-cloud-sun fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Previsão do Tempo</h5>
+                    <p class="text-muted mb-3">
+                        Adicione coordenadas geográficas ao filme para visualizar a previsão do tempo.
+                    </p>
+                    <a asp-action="Editar" asp-route-id="@Model.Id" class="btn btn-primary btn-gradient">
+                        <i class="fas fa-map-marker-alt me-2"></i>Adicionar Localização
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    .info-item {
+        padding: 0.5rem 0;
+    }
+
+    .info-item h6 {
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    .info-item p {
+        font-size: 1rem;
+        margin-bottom: 0;
+    }
+
+    .card-img-wrapper {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card-img-wrapper img {
+        transition: transform 0.5s ease;
+    }
+
+    .card:hover .card-img-wrapper img {
+        transform: scale(1.05);
+    }
+
+    .rating-badge {
+        background: rgba(255, 193, 7, 0.95);
+        color: #212529;
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+</style>
