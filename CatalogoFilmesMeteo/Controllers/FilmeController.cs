@@ -1,76 +1,93 @@
 using Microsoft.AspNetCore.Mvc;
-using CatalogoFilmesMeteo.Repositories;
+using CatalogoFilmesMeteo.Models;
 using CatalogoFilmesMeteo.Services;
+using CatalogoFilmesMeteo.Repositories;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace CatalogoFilmesMeteo.Controllers;
 
-/// <summary>
-/// Controller responsável por gerenciar operações relacionadas a filmes,
-/// incluindo exportação para CSV e Excel.
-/// </summary>
 public class FilmeController : Controller
 {
     private readonly IFilmeRepository _filmeRepository;
-    private readonly IExportService _exportService;
+    private readonly IServicoTmdbApi _tmdbService;
     private readonly ILogger<FilmeController> _logger;
 
     public FilmeController(
         IFilmeRepository filmeRepository,
-        IExportService exportService,
+        IServicoTmdbApi tmdbService,
         ILogger<FilmeController> logger)
     {
         _filmeRepository = filmeRepository;
-        _exportService = exportService;
+        _tmdbService = tmdbService;
         _logger = logger;
     }
 
-    /// <summary>
-    /// Exporta todos os filmes do catálogo para formato CSV e retorna como download.
-    /// </summary>
-    /// <returns>FileResult com o arquivo CSV para download</returns>
-    public async Task<IActionResult> ExportCsv()
+    [HttpGet]
+    public async Task<IActionResult> Editar(int id)
     {
         try
         {
-            var filmes = await _filmeRepository.ListAsync();
-            var bytes = await _exportService.ExportToCsvAsync(filmes);
+            var filme = await _filmeRepository.GetByIdAsync(id);
+            if (filme == null)
+            {
+                TempData["ErrorMessage"] = "Filme não encontrado.";
+                return RedirectToAction("Index", "Gerenciar");
+            }
 
-            return File(
-                fileContents: bytes,
-                contentType: "text/csv",
-                fileDownloadName: $"catalogo_filmes_{DateTime.Now:yyyyMMdd_HHmmss}.csv"
-            );
+            return View(filme);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Erro ao exportar filmes para CSV");
-            TempData["ErrorMessage"] = "Erro ao exportar catálogo para CSV. Tente novamente.";
+            _logger.LogError(ex, "Erro ao carregar filme para edição");
+            TempData["ErrorMessage"] = "Erro ao carregar filme para edição.";
             return RedirectToAction("Index", "Gerenciar");
         }
     }
 
-    /// <summary>
-    /// Exporta todos os filmes do catálogo para formato Excel (.xlsx) e retorna como download.
-    /// </summary>
-    /// <returns>FileResult com o arquivo Excel para download</returns>
-    public async Task<IActionResult> ExportExcel()
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Editar(Filme filme)
     {
         try
         {
-            var filmes = await _filmeRepository.ListAsync();
-            var bytes = await _exportService.ExportToExcelAsync(filmes);
+            if (!ModelState.IsValid)
+            {
+                return View(filme);
+            }
 
-            return File(
-                fileContents: bytes,
-                contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                fileDownloadName: $"catalogo_filmes_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx"
-            );
+            // Preserva os campos que não são editáveis
+            var filmeExistente = await _filmeRepository.GetByIdAsync(filme.Id);
+            if (filmeExistente == null)
+            {
+                TempData["ErrorMessage"] = "Filme não encontrado.";
+                return RedirectToAction("Index", "Gerenciar");
+            }
+
+            // Atualiza apenas os campos editáveis
+            filmeExistente.Titulo = filme.Titulo;
+            filmeExistente.TituloOriginal = filme.TituloOriginal;
+            filmeExistente.Sinopse = filme.Sinopse;
+            filmeExistente.DataLancamento = filme.DataLancamento;
+            filmeExistente.Genero = filme.Genero;
+            filmeExistente.Lingua = filme.Lingua;
+            filmeExistente.Duracao = filme.Duracao;
+            filmeExistente.NotaMedia = filme.NotaMedia;
+            filmeExistente.ElencoPrincipal = filme.ElencoPrincipal;
+            filmeExistente.CidadeReferencia = filme.CidadeReferencia;
+            filmeExistente.Latitude = filme.Latitude;
+            filmeExistente.Longitude = filme.Longitude;
+            filmeExistente.DataAtualizacao = DateTime.Now;
+
+            await _filmeRepository.UpdateAsync(filmeExistente);
+
+            TempData["SuccessMessage"] = $"Filme '{filme.Titulo}' atualizado com sucesso!";
+            return RedirectToAction("Detalhes", new { id = filme.Id });
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Erro ao exportar filmes para Excel");
-            TempData["ErrorMessage"] = "Erro ao exportar catálogo para Excel. Tente novamente.";
-            return RedirectToAction("Index", "Gerenciar");
+            _logger.LogError(ex, "Erro ao atualizar filme ID: {Id}", filme.Id);
+            TempData["ErrorMessage"] = "Erro ao atualizar filme. Tente novamente.";
+            return View(filme);
         }
     }
 }

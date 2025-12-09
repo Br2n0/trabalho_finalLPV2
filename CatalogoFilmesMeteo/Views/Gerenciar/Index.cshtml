@@ -8,14 +8,17 @@
 <div class="mb-4">
     <div class="d-flex justify-content-between align-items-center">
         <div>
-            <h1 class="display-5 fw-bold">
-                <i class="fas fa-list text-primary"></i> Meu Catálogo de Filmes
+            <h1 class="display-5 fw-bold text-gradient-primary">
+                <i class="fas fa-list me-2"></i> Meu Catálogo de Filmes
             </h1>
             <p class="text-muted">
                 <i class="fas fa-film me-1"></i>@Model.Count() filme(s) no catálogo
             </p>
         </div>
         <div>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary me-2">
+                <i class="fas fa-arrow-left me-2"></i>Voltar para Início
+            </a>
             <a asp-controller="Busca" asp-action="Index" class="btn btn-primary">
                 <i class="fas fa-plus me-2"></i>Adicionar Filme
             </a>
@@ -48,12 +51,22 @@
             var posterUrl = TmdbService.ConstruirUrlPoster(filme.PosterPath, "w300");
             
             <div class="col-md-6 col-lg-4 col-xl-3">
-                <div class="card h-100 shadow-sm border-0 filme-card">
-                    <img src="@posterUrl" 
-                         class="card-img-top" 
-                         alt="@filme.Titulo"
-                         onerror="this.src='/images/no-poster.png'"
-                         style="height: 350px; object-fit: cover;">
+                <div class="card h-100 shadow-lg border-0 filme-card animate-on-hover">
+                    <div class="card-img-wrapper">
+                        <img src="@posterUrl" 
+                             class="card-img-top" 
+                             alt="@filme.Titulo"
+                             onerror="this.src='/images/no-poster.png'"
+                             style="height: 350px; object-fit: cover;">
+                        <div class="card-img-overlay d-flex justify-content-center align-items-end">
+                            @if (filme.NotaMedia.HasValue)
+                            {
+                                <span class="badge bg-warning text-dark rating-badge">
+                                    <i class="fas fa-star"></i> @filme.NotaMedia.Value.ToString("F1")
+                                </span>
+                            }
+                        </div>
+                    </div>
                     
                     <div class="card-body d-flex flex-column">
                         <h5 class="card-title text-truncate" title="@filme.Titulo">
@@ -67,13 +80,6 @@
                                     <i class="fas fa-calendar me-1"></i>@filme.DataLancamento.Value.Year
                                 </small>
                             }
-                            
-                            @if (filme.NotaMedia.HasValue)
-                            {
-                                <span class="badge bg-warning text-dark float-end">
-                                    <i class="fas fa-star"></i> @filme.NotaMedia.Value.ToString("F1")
-                                </span>
-                            }
                         </div>
                         
                         @if (!string.IsNullOrEmpty(filme.Genero))
@@ -86,7 +92,7 @@
                         @if (!string.IsNullOrEmpty(filme.CidadeReferencia))
                         {
                             <p class="card-text small text-muted mb-2">
-                                <i class="fas fa-map-marker-alt me-1"></i>@filme.CidadeReferencia
+                                <i class="fas fa-map-marker-alt me-1 text-primary"></i>@filme.CidadeReferencia
                             </p>
                         }
                         
@@ -98,15 +104,18 @@
                         }
                         
                         <div class="mt-auto pt-3">
-                            <a asp-action="Detalhes" asp-route-id="@filme.Id" class="btn btn-primary btn-sm w-100 mb-2">
+                            <a asp-action="Detalhes" asp-route-id="@filme.Id" 
+                               class="btn btn-primary btn-sm w-100 mb-2 btn-gradient">
                                 <i class="fas fa-eye me-1"></i>Ver Detalhes
                             </a>
                             <div class="d-flex gap-2">
-                                <a asp-action="Editar" asp-route-id="@filme.Id" class="btn btn-outline-secondary btn-sm flex-fill">
-                                    <i class="fas fa-edit"></i>
+                                <a asp-action="Editar" asp-route-id="@filme.Id" 
+                                   class="btn btn-outline-secondary btn-sm flex-fill">
+                                    <i class="fas fa-edit"></i> Editar
                                 </a>
-                                <a asp-action="Deletar" asp-route-id="@filme.Id" class="btn btn-outline-danger btn-sm flex-fill">
-                                    <i class="fas fa-trash"></i>
+                                <a asp-action="Deletar" asp-route-id="@filme.Id" 
+                                   class="btn btn-outline-danger btn-sm flex-fill">
+                                    <i class="fas fa-trash"></i> Excluir
                                 </a>
                             </div>
                         </div>
@@ -118,15 +127,17 @@
 }
 else
 {
-    <div class="alert alert-info text-center py-5" role="alert">
-        <i class="fas fa-inbox fa-4x mb-3 text-muted"></i>
-        <h4 class="alert-heading">Seu catálogo está vazio</h4>
-        <p>Você ainda não importou nenhum filme para seu catálogo pessoal.</p>
-        <hr>
-        <p class="mb-0">
-            <a asp-controller="Busca" asp-action="Index" class="btn btn-primary btn-lg">
+    <div class="card shadow-lg border-0">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-inbox fa-4x text-muted mb-4"></i>
+            <h4 class="card-title text-muted">Seu catálogo está vazio</h4>
+            <p class="card-text text-muted mb-4">Você ainda não importou nenhum filme para seu catálogo pessoal.</p>
+            <a asp-controller="Busca" asp-action="Index" class="btn btn-primary btn-lg btn-gradient">
                 <i class="fas fa-search me-2"></i>Buscar e Importar Filmes
             </a>
-        </p>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary btn-lg ms-2">
+                <i class="fas fa-home me-2"></i>Voltar para Início
+            </a>
+        </div>
     </div>
 }
