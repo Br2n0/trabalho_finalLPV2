@@ -31,4 +31,3 @@ public class ConfiguracaoImagensTmdb
     [JsonPropertyName("still_sizes")]
     public List<string> TamanhosStill { get; set; } = new();
 }
-

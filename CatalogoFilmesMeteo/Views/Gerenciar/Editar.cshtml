@@ -1,0 +1,175 @@
+@model CatalogoFilmesMeteo.Models.Filme
+
+@{
+    ViewData["Title"] = "Editar Filme";
+}
+
+<div class="mb-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a asp-action="Index">
+                    <i class="fas fa-home me-1"></i>Catálogo
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a asp-action="Detalhes" asp-route-id="@Model.Id">@Model.Titulo</a>
+            </li>
+            <li class="breadcrumb-item active">Editar</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow border-0">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-edit me-2"></i>Editar Filme
+                </h4>
+            </div>
+            <div class="card-body">
+                <form asp-action="Editar" method="post">
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="TmdbId" />
+                    <input type="hidden" asp-for="PosterPath" />
+                    <input type="hidden" asp-for="DataCriacao" />
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Dica:</strong> Os campos marcados com * são obrigatórios
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Titulo" class="form-label">
+                                <i class="fas fa-film me-1"></i>Título *
+                            </label>
+                            <input asp-for="Titulo" class="form-control" required />
+                            <span asp-validation-for="Titulo" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="TituloOriginal" class="form-label">
+                                <i class="fas fa-language me-1"></i>Título Original *
+                            </label>
+                            <input asp-for="TituloOriginal" class="form-control" required />
+                            <span asp-validation-for="TituloOriginal" class="text-danger"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label asp-for="Sinopse" class="form-label">
+                            <i class="fas fa-book me-1"></i>Sinopse
+                        </label>
+                        <textarea asp-for="Sinopse" class="form-control" rows="4"></textarea>
+                        <span asp-validation-for="Sinopse" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="DataLancamento" class="form-label">
+                                <i class="fas fa-calendar me-1"></i>Data de Lançamento
+                            </label>
+                            <input asp-for="DataLancamento" type="date" class="form-control" />
+                            <span asp-validation-for="DataLancamento" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="Duracao" class="form-label">
+                                <i class="fas fa-clock me-1"></i>Duração (minutos)
+                            </label>
+                            <input asp-for="Duracao" type="number" class="form-control" />
+                            <span asp-validation-for="Duracao" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="NotaMedia" class="form-label">
+                                <i class="fas fa-star me-1"></i>Nota Média
+                            </label>
+                            <input asp-for="NotaMedia" type="number" step="0.1" class="form-control" />
+                            <span asp-validation-for="NotaMedia" class="text-danger"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Genero" class="form-label">
+                                <i class="fas fa-tags me-1"></i>Gênero
+                            </label>
+                            <input asp-for="Genero" class="form-control" placeholder="Ex: Ação, Ficção" />
+                            <span asp-validation-for="Genero" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Lingua" class="form-label">
+                                <i class="fas fa-globe me-1"></i>Língua
+                            </label>
+                            <input asp-for="Lingua" class="form-control" placeholder="Ex: pt, en" />
+                            <span asp-validation-for="Lingua" class="text-danger"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label asp-for="ElencoPrincipal" class="form-label">
+                            <i class="fas fa-users me-1"></i>Elenco Principal
+                        </label>
+                        <input asp-for="ElencoPrincipal" class="form-control" placeholder="Separado por vírgulas" />
+                        <span asp-validation-for="ElencoPrincipal" class="text-danger"></span>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <h5 class="mb-3">
+                        <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                        Localização e Previsão do Tempo
+                    </h5>
+                    
+                    <div class="mb-3">
+                        <label asp-for="CidadeReferencia" class="form-label">
+                            <i class="fas fa-city me-1"></i>Cidade de Referência
+                        </label>
+                        <input asp-for="CidadeReferencia" class="form-control" placeholder="Ex: São Paulo" />
+                        <span asp-validation-for="CidadeReferencia" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Latitude" class="form-label">
+                                <i class="fas fa-map-pin me-1"></i>Latitude
+                            </label>
+                            <input asp-for="Latitude" type="number" step="0.000001" class="form-control" placeholder="-23.550520" />
+                            <span asp-validation-for="Latitude" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Longitude" class="form-label">
+                                <i class="fas fa-map-pin me-1"></i>Longitude
+                            </label>
+                            <input asp-for="Longitude" type="number" step="0.000001" class="form-control" placeholder="-46.633308" />
+                            <span asp-validation-for="Longitude" class="text-danger"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-warning small">
+                        <i class="fas fa-exclamation-triangle me-1"></i>
+                        <strong>Importante:</strong> As coordenadas são necessárias para exibir a previsão do tempo na página de detalhes
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <a asp-action="Detalhes" asp-route-id="@Model.Id" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Salvar Alterações
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

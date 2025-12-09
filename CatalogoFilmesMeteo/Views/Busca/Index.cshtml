@@ -1,0 +1,78 @@
+@{
+    ViewData["Title"] = "Buscar Filmes";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="text-center mb-5">
+            <h1 class="display-5 fw-bold">
+                <i class="fas fa-search text-primary"></i> Buscar Filmes
+            </h1>
+            <p class="lead text-muted">Pesquise filmes no The Movie Database (TMDb)</p>
+        </div>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <form asp-action="Pesquisar" method="get">
+                    <div class="input-group input-group-lg">
+                        <span class="input-group-text bg-primary text-white">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" 
+                               class="form-control" 
+                               name="query" 
+                               placeholder="Digite o nome do filme..." 
+                               required 
+                               autofocus>
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-search me-2"></i>Pesquisar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="mt-4 text-center">
+            <small class="text-muted">
+                <i class="fas fa-info-circle me-1"></i>
+                Exemplos: "Matrix", "Star Wars", "Avengers"
+            </small>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4">
+        <div class="d-flex align-items-start">
+            <div class="me-3">
+                <i class="fas fa-lightbulb fa-2x text-warning"></i>
+            </div>
+            <div>
+                <h5>Dica 1</h5>
+                <p class="text-muted small">Digite o nome do filme em inglês ou português</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="d-flex align-items-start">
+            <div class="me-3">
+                <i class="fas fa-lightbulb fa-2x text-warning"></i>
+            </div>
+            <div>
+                <h5>Dica 2</h5>
+                <p class="text-muted small">Use termos específicos para melhores resultados</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="d-flex align-items-start">
+            <div class="me-3">
+                <i class="fas fa-lightbulb fa-2x text-warning"></i>
+            </div>
+            <div>
+                <h5>Dica 3</h5>
+                <p class="text-muted small">Clique em "Importar" para adicionar ao seu catálogo</p>
+            </div>
+        </div>
+    </div>
+</div>

@@ -29,3 +29,177 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+
+/* ===================================
+   ESTILOS PERSONALIZADOS - CATÁLOGO DE FILMES
+   =================================== */
+
+/* Estilos gerais */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+}
+
+/* Animações suaves */
+* {
+  transition: all 0.3s ease;
+}
+
+/* Card de filme com hover */
+.filme-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.filme-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Imagens responsivas */
+.filme-card img {
+  transition: transform 0.3s ease;
+}
+
+.filme-card:hover img {
+  transform: scale(1.05);
+}
+
+/* Navbar customizada */
+.navbar-dark {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+.navbar-brand {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* Botões customizados */
+.btn {
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 0.5rem 1.5rem;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+/* Cards */
+.card {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.card-header {
+  border-radius: 12px 12px 0 0 !important;
+}
+
+/* Alerts personalizados */
+.alert {
+  border-radius: 12px;
+  border: none;
+}
+
+/* Badge de nota */
+.badge {
+  font-size: 0.9rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+}
+
+/* Footer */
+footer {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  margin-top: auto;
+}
+
+/* Breadcrumb */
+.breadcrumb {
+  background: transparent;
+  padding: 0;
+}
+
+/* Input focus */
+.form-control:focus,
+.form-select:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+/* Paginação */
+.pagination .page-link {
+  color: #667eea;
+  border-radius: 8px;
+  margin: 0 3px;
+}
+
+.pagination .page-item.active .page-link {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-color: #667eea;
+}
+
+/* Animação de loading */
+@keyframes pulse {
+  0%, 100% {
+      opacity: 1;
+  }
+  50% {
+      opacity: 0.5;
+  }
+}
+
+.loading {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .display-4 {
+      font-size: 2rem;
+  }
+  
+  .display-5 {
+      font-size: 1.5rem;
+  }
+  
+  .filme-card {
+      margin-bottom: 1rem;
+  }
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #764ba2;
+}
+
+/* Placeholder para imagem não encontrada */
+img[src="/images/no-poster.png"] {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

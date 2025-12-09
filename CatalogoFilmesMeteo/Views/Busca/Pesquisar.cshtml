@@ -1,0 +1,84 @@
+@model CatalogoFilmesMeteo.Models.DTOs.RespostaBuscaTmdb
+
+@{
+    ViewData["Title"] = "Resultados da Busca";
+}
+
+<div class="mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="mb-2">
+                <i class="fas fa-search text-primary"></i> Resultados para: <strong>"@ViewBag.Query"</strong>
+            </h2>
+            <p class="text-muted">
+                <i class="fas fa-film me-1"></i>@Model.TotalResultados resultado(s) encontrado(s)
+            </p>
+        </div>
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Nova Busca
+        </a>
+    </div>
+</div>
+
+@if (Model.Resultados.Any())
+{
+    <div class="row g-4">
+        @foreach (var filme in Model.Resultados)
+        {
+            <div class="col-md-6 col-lg-4">
+                <partial name="_CardFilmeTmdb" model="filme" />
+            </div>
+        }
+    </div>
+
+    @* Paginação *@
+    @if (Model.TotalPaginas > 1)
+    {
+        <nav aria-label="Navegação de páginas" class="mt-5">
+            <ul class="pagination justify-content-center">
+                @if (Model.Pagina > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Pesquisar" asp-route-query="@ViewBag.Query"
+                            asp-route-pagina="@(Model.Pagina - 1)">
+                            <i class="fas fa-chevron-left"></i> Anterior
+                        </a>
+                    </li>
+                }
+
+                @for (int i = Math.Max(1, Model.Pagina - 2); i <= Math.Min(Model.TotalPaginas, Model.Pagina + 2); i++)
+                {
+                    <li class="page-item @(i == Model.Pagina ? "active" : "")">
+                        <a class="page-link" asp-action="Pesquisar" asp-route-query="@ViewBag.Query" asp-route-pagina="@i">
+                            @i
+                        </a>
+                    </li>
+                }
+
+                @if (Model.Pagina < Model.TotalPaginas)
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Pesquisar" asp-route-query="@ViewBag.Query"
+                            asp-route-pagina="@(Model.Pagina + 1)">
+                            Próxima <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+}
+else
+{
+    <div class="alert alert-warning text-center" role="alert">
+        <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
+        <h4 class="alert-heading">Nenhum resultado encontrado</h4>
+        <p>Não encontramos nenhum filme com o termo "<strong>@ViewBag.Query</strong>"</p>
+        <hr>
+        <p class="mb-0">
+            <a asp-action="Index" class="btn btn-warning">
+                <i class="fas fa-redo me-2"></i>Tentar outra busca
+            </a>
+        </p>
+    </div>
+}

@@ -46,4 +46,3 @@ public class ResultadoFilmeTmdb
     [JsonPropertyName("vote_count")]
     public int TotalVotos { get; set; }
 }
-

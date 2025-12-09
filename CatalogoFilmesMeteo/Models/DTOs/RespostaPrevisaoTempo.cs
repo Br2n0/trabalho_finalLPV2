@@ -28,4 +28,3 @@ public class PrevisaoDiaria
     [JsonPropertyName("temperature_2m_min")]
     public List<decimal?> TemperaturaMinima { get; set; } = new();
 }
-

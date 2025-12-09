@@ -1,0 +1,100 @@
+@model CatalogoFilmesMeteo.Models.Filme
+
+@{
+    ViewData["Title"] = "Confirmar Exclusão";
+    var posterUrl = ViewBag.PosterUrl as string;
+}
+
+<div class="mb-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a asp-action="Index">
+                    <i class="fas fa-home me-1"></i>Catálogo
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a asp-action="Detalhes" asp-route-id="@Model.Id">@Model.Titulo</a>
+            </li>
+            <li class="breadcrumb-item active">Deletar</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow border-0">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Confirmar Exclusão
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <strong>Atenção!</strong> Esta ação não pode ser desfeita.
+                </div>
+                
+                <div class="text-center mb-4">
+                    <img src="@posterUrl" 
+                         alt="@Model.Titulo" 
+                         class="img-fluid rounded shadow-sm"
+                         onerror="this.src='/images/no-poster.png'"
+                         style="max-height: 400px;">
+                </div>
+                
+                <h5 class="text-center mb-3">Tem certeza que deseja remover este filme do catálogo?</h5>
+                
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4">Título:</dt>
+                            <dd class="col-sm-8">@Model.Titulo</dd>
+                            
+                            @if (!string.IsNullOrEmpty(Model.TituloOriginal) && Model.TituloOriginal != Model.Titulo)
+                            {
+                                <dt class="col-sm-4">Título Original:</dt>
+                                <dd class="col-sm-8">@Model.TituloOriginal</dd>
+                            }
+                            
+                            @if (Model.DataLancamento.HasValue)
+                            {
+                                <dt class="col-sm-4">Lançamento:</dt>
+                                <dd class="col-sm-8">@Model.DataLancamento.Value.ToString("dd/MM/yyyy")</dd>
+                            }
+                            
+                            @if (!string.IsNullOrEmpty(Model.Genero))
+                            {
+                                <dt class="col-sm-4">Gênero:</dt>
+                                <dd class="col-sm-8">@Model.Genero</dd>
+                            }
+                            
+                            @if (Model.NotaMedia.HasValue)
+                            {
+                                <dt class="col-sm-4">Nota:</dt>
+                                <dd class="col-sm-8">
+                                    <span class="badge bg-warning text-dark">
+                                        <i class="fas fa-star"></i> @Model.NotaMedia.Value.ToString("F1")
+                                    </span>
+                                </dd>
+                            }
+                        </dl>
+                    </div>
+                </div>
+                
+                <form asp-action="Deletar" method="post" class="mt-4">
+                    <input type="hidden" asp-for="Id" />
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                        <a asp-action="Detalhes" asp-route-id="@Model.Id" class="btn btn-secondary btn-lg">
+                            <i class="fas fa-arrow-left me-2"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-danger btn-lg">
+                            <i class="fas fa-trash me-2"></i>Sim, Remover Filme
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

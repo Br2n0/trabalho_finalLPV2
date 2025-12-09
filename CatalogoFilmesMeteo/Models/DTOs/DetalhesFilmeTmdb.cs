@@ -82,4 +82,3 @@ public class ElencoTmdb
     [JsonPropertyName("order")]
     public int Ordem { get; set; }
 }
-

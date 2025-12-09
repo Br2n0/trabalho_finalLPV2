@@ -20,4 +20,3 @@ public class Filme
     public DateTime DataCriacao { get; set; }
     public DateTime DataAtualizacao { get; set; }
 }
-

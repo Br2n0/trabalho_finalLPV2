@@ -13,7 +13,7 @@ public interface IExportService
     /// Retorna os bytes do arquivo CSV gerado.
     /// </summary>
     Task<byte[]> ExportToCsvAsync(IEnumerable<Filme> filmes);
-    
+
     /// <summary>
     /// Exporta uma lista de filmes para formato Excel (.xlsx).
     /// Retorna os bytes do arquivo Excel gerado.

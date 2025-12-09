@@ -34,4 +34,3 @@ public class ImagemTmdb
     [JsonPropertyName("vote_count")]
     public int TotalVotos { get; set; }
 }
-
