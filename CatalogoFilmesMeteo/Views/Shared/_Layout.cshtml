@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    
+    @await RenderSectionAsync("Styles", required: false)
+    
     <style>
         .navbar-gradient {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -124,7 +127,7 @@
             </p>
             <div class="mt-3">
                 <small class="text-light opacity-75">
-                    <i class="fas fa-code me-1"></i>por [Seu Nome/Equipe]
+                    <i class="fas fa-code me-1"></i>por [Bruno Santos e Leidervan Ortiz]
                 </small>
             </div>
         </div>
