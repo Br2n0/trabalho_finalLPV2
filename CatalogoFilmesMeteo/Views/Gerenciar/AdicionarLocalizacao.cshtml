@@ -1,0 +1,228 @@
+@model CatalogoFilmesMeteo.Models.Filme
+
+@{
+    ViewData["Title"] = "Adicionar Localização";
+}
+
+<div class="mb-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a asp-action="Index">
+                    <i class="fas fa-home me-1"></i>Catálogo
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a asp-action="Detalhes" asp-route-id="@Model.Id">@Model.Titulo</a>
+            </li>
+            <li class="breadcrumb-item active">Adicionar Localização</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow border-0">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-map-marker-alt me-2"></i>Adicionar Localização
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info mb-4">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Filme:</strong> @Model.Titulo
+                </div>
+
+                <form asp-action="AdicionarLocalizacao" method="post">
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    
+                    <h5 class="mb-3">
+                        <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                        Informações de Localização
+                    </h5>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-city me-1"></i>Cidade de Referência
+                        </label>
+                        <div class="input-group">
+                            <input type="text" 
+                                   class="form-control" 
+                                   name="cidade" 
+                                   id="cidadeAdd"
+                                   value="@Model.CidadeReferencia"
+                                   placeholder="Ex: São Paulo">
+                            <button type="button" 
+                                    class="btn btn-outline-secondary" 
+                                    id="btnBuscarCoordenadasAdd" 
+                                    title="Buscar coordenadas automaticamente">
+                                <i class="fas fa-search"></i> Buscar
+                            </button>
+                        </div>
+                        <small class="form-text text-muted">
+                            Clique em "Buscar" para preencher coordenadas automaticamente via Nominatim.
+                        </small>
+                        <div id="coordenadasStatusAdd" class="mt-2"></div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-map-pin me-1"></i>Latitude
+                            </label>
+                            <input type="number" 
+                                   step="any" 
+                                   class="form-control" 
+                                   name="latitude" 
+                                   id="latitudeAdd"
+                                   min="-90"
+                                   max="90"
+                                   value="@(Model.Latitude?.ToString() ?? "")"
+                                   placeholder="-23.550520">
+                            <small class="form-text text-danger d-none" id="latErrorAdd">
+                                Latitude deve estar entre -90 e 90
+                            </small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-map-pin me-1"></i>Longitude
+                            </label>
+                            <input type="number" 
+                                   step="any" 
+                                   class="form-control" 
+                                   name="longitude" 
+                                   id="longitudeAdd"
+                                   min="-180"
+                                   max="180"
+                                   value="@(Model.Longitude?.ToString() ?? "")"
+                                   placeholder="-46.633308">
+                            <small class="form-text text-danger d-none" id="lonErrorAdd">
+                                Longitude deve estar entre -180 e 180
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-warning small">
+                        <i class="fas fa-exclamation-triangle me-1"></i>
+                        <strong>Importante:</strong> As coordenadas são necessárias para exibir a previsão do tempo na página de detalhes
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <a asp-action="Detalhes" asp-route-id="@Model.Id" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Salvar Localização
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function() {
+            const btnBuscar = document.getElementById('btnBuscarCoordenadasAdd');
+            const cidadeInput = document.getElementById('cidadeAdd');
+            const latInput = document.getElementById('latitudeAdd');
+            const lonInput = document.getElementById('longitudeAdd');
+            const statusDiv = document.getElementById('coordenadasStatusAdd');
+            const latError = document.getElementById('latErrorAdd');
+            const lonError = document.getElementById('lonErrorAdd');
+
+            function validateCoordinates() {
+                let isValid = true;
+                
+                if (latInput.value) {
+                    const lat = parseFloat(latInput.value);
+                    if (isNaN(lat) || lat < -90 || lat > 90) {
+                        latError.classList.remove('d-none');
+                        latInput.classList.add('is-invalid');
+                        isValid = false;
+                    } else {
+                        latError.classList.add('d-none');
+                        latInput.classList.remove('is-invalid');
+                    }
+                } else {
+                    latError.classList.add('d-none');
+                    latInput.classList.remove('is-invalid');
+                }
+
+                if (lonInput.value) {
+                    const lon = parseFloat(lonInput.value);
+                    if (isNaN(lon) || lon < -180 || lon > 180) {
+                        lonError.classList.remove('d-none');
+                        lonInput.classList.add('is-invalid');
+                        isValid = false;
+                    } else {
+                        lonError.classList.add('d-none');
+                        lonInput.classList.remove('is-invalid');
+                    }
+                } else {
+                    lonError.classList.add('d-none');
+                    lonInput.classList.remove('is-invalid');
+                }
+
+                return isValid;
+            }
+
+            latInput.addEventListener('blur', validateCoordinates);
+            lonInput.addEventListener('blur', validateCoordinates);
+
+            // Validação no submit do formulário
+            const form = latInput.closest('form');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    if (!validateCoordinates()) {
+                        e.preventDefault();
+                        // Scroll para o primeiro erro
+                        const firstError = document.querySelector('.is-invalid');
+                        if (firstError) {
+                            firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            firstError.focus();
+                        }
+                    }
+                });
+            }
+
+            if (btnBuscar && cidadeInput && latInput && lonInput) {
+                btnBuscar.addEventListener('click', async function() {
+                    const cidade = cidadeInput.value.trim();
+                    if (!cidade) {
+                        statusDiv.innerHTML = '<div class="alert alert-warning mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Digite o nome da cidade primeiro.</div>';
+                        return;
+                    }
+
+                    btnBuscar.disabled = true;
+                    btnBuscar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Buscando...';
+                    statusDiv.innerHTML = '<div class="alert alert-info mb-0"><i class="fas fa-spinner fa-spin me-2"></i>Buscando coordenadas no Nominatim...</div>';
+
+                    try {
+                        const response = await fetch(`/Busca/BuscarCoordenadas?cidade=${encodeURIComponent(cidade)}`);
+                        const data = await response.json();
+
+                        if (data.sucesso) {
+                            // Converter vírgula para ponto e arredondar para 6 casas decimais
+                            const lat = parseFloat(String(data.latitude).replace(',', '.')).toFixed(6);
+                            const lon = parseFloat(String(data.longitude).replace(',', '.')).toFixed(6);
+                            latInput.value = lat;
+                            lonInput.value = lon;
+                            statusDiv.innerHTML = '<div class="alert alert-success mb-0"><i class="fas fa-check-circle me-2"></i>Coordenadas encontradas e preenchidas automaticamente!</div>';
+                        } else {
+                            statusDiv.innerHTML = `<div class="alert alert-warning mb-0"><i class="fas fa-exclamation-triangle me-2"></i>${data.mensagem || 'Cidade não encontrada.'}</div>`;
+                        }
+                    } catch (error) {
+                        statusDiv.innerHTML = '<div class="alert alert-danger mb-0"><i class="fas fa-times-circle me-2"></i>Erro ao buscar coordenadas. Tente novamente.</div>';
+                    } finally {
+                        btnBuscar.disabled = false;
+                        btnBuscar.innerHTML = '<i class="fas fa-search"></i> Buscar';
+                    }
+                });
+            }
+        })();
+    </script>
+}
+

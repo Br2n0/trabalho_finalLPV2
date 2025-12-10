@@ -238,7 +238,6 @@ public class FilmeRepository : IFilmeRepository
             using var command = new SqliteCommand(sql, connection);
             command.Parameters.AddWithValue("@Id", filme.Id);
             AdicionarParametrosFilme(command, filme);
-            command.Parameters.AddWithValue("@DataAtualizacao", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
 
             var linhasAfetadas = await command.ExecuteNonQueryAsync();
 
@@ -294,7 +293,7 @@ public class FilmeRepository : IFilmeRepository
         command.Parameters.AddWithValue("@TituloOriginal", filme.TituloOriginal);
         command.Parameters.AddWithValue("@Sinopse", filme.Sinopse ?? (object)DBNull.Value);
         command.Parameters.AddWithValue("@DataLancamento",
-            filme.DataLancamento?.ToString("yyyy-MM-dd") ?? (object)DBNull.Value);
+            filme.DataLancamento?.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture) ?? (object)DBNull.Value);
         command.Parameters.AddWithValue("@Genero", filme.Genero ?? (object)DBNull.Value);
         command.Parameters.AddWithValue("@PosterPath", filme.PosterPath ?? (object)DBNull.Value);
         command.Parameters.AddWithValue("@Lingua", filme.Lingua ?? (object)DBNull.Value);
@@ -305,9 +304,9 @@ public class FilmeRepository : IFilmeRepository
         command.Parameters.AddWithValue("@Latitude", filme.Latitude ?? (object)DBNull.Value);
         command.Parameters.AddWithValue("@Longitude", filme.Longitude ?? (object)DBNull.Value);
         command.Parameters.AddWithValue("@DataCriacao",
-            filme.DataCriacao.ToString("yyyy-MM-dd HH:mm:ss"));
+            filme.DataCriacao.ToString("yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture));
         command.Parameters.AddWithValue("@DataAtualizacao",
-            filme.DataAtualizacao.ToString("yyyy-MM-dd HH:mm:ss"));
+            DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture));
     }
 
     private Filme MapearFilmeDoBanco(SqliteDataReader reader)

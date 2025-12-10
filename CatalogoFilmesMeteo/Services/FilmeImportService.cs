@@ -72,43 +72,76 @@ public class FilmeImportService : IFilmeImportService
 
     public async Task<Filme> ImportarFilmeAsync(int tmdbId, string? cidade, decimal? latitude, decimal? longitude)
     {
+        _logger.LogInformation("Importando filme - TmdbId: {TmdbId}, Cidade: {Cidade}, Lat: {Lat}, Lon: {Lon}", 
+            tmdbId, cidade ?? "null", latitude?.ToString() ?? "null", longitude?.ToString() ?? "null");
+
         try
         {
             // Obtém os detalhes do filme do TMDb
+            _logger.LogDebug("Buscando detalhes do filme no TMDb - TmdbId: {TmdbId}", tmdbId);
             var detalhesTmdb = await _tmdbService.ObterDetalhesFilmeAsync(tmdbId);
+            _logger.LogDebug("Detalhes obtidos - Titulo: {Titulo}", detalhesTmdb.Titulo);
 
             // Importa o filme
             var filme = await ImportarFilmeAsync(detalhesTmdb);
+            _logger.LogInformation("Filme importado - Id: {Id}, Titulo: {Titulo}", filme.Id, filme.Titulo);
 
             // Atualiza a localização, se fornecida
             // Mesmo que cidade seja vazia, se tiver coordenadas, atualiza
             if (!string.IsNullOrWhiteSpace(cidade) || latitude.HasValue || longitude.HasValue)
             {
+                _logger.LogDebug("Atualizando localização - Cidade: {Cidade}, Lat: {Lat}, Lon: {Lon}", 
+                    cidade ?? "null", latitude?.ToString() ?? "null", longitude?.ToString() ?? "null");
+
+                bool atualizado = false;
+                
                 if (!string.IsNullOrWhiteSpace(cidade))
                 {
-                    filme.CidadeReferencia = cidade;
+                    filme.CidadeReferencia = cidade.Trim();
+                    atualizado = true;
+                    _logger.LogDebug("Cidade definida: {Cidade}", filme.CidadeReferencia);
                 }
+                
                 if (latitude.HasValue)
                 {
                     filme.Latitude = latitude;
+                    atualizado = true;
+                    _logger.LogDebug("Latitude definida: {Lat}", filme.Latitude);
                 }
+                
                 if (longitude.HasValue)
                 {
                     filme.Longitude = longitude;
+                    atualizado = true;
+                    _logger.LogDebug("Longitude definida: {Lon}", filme.Longitude);
                 }
-                filme.DataAtualizacao = DateTime.Now;
-
-                await _filmeRepository.UpdateAsync(filme);
                 
-                _logger.LogInformation("Localização atualizada para filme {FilmeId}: Cidade={Cidade}, Lat={Lat}, Lon={Lon}", 
-                    filme.Id, filme.CidadeReferencia, filme.Latitude, filme.Longitude);
+                if (atualizado)
+                {
+                    filme.DataAtualizacao = DateTime.Now;
+                    await _filmeRepository.UpdateAsync(filme);
+                    
+                    _logger.LogInformation("Localização atualizada com sucesso para filme {FilmeId}: Cidade={Cidade}, Lat={Lat}, Lon={Lon}", 
+                        filme.Id, filme.CidadeReferencia ?? "null", 
+                        filme.Latitude?.ToString() ?? "null", filme.Longitude?.ToString() ?? "null");
+                }
+            }
+            else
+            {
+                _logger.LogDebug("Nenhuma informação de localização fornecida para o filme {FilmeId}", filme.Id);
             }
 
             return filme;
         }
+        catch (InvalidOperationException)
+        {
+            // Re-lança exceções de negócio (como filme duplicado)
+            throw;
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Erro ao importar filme por TmdbId: {TmdbId}", tmdbId);
+            _logger.LogError(ex, "Erro ao importar filme por TmdbId: {TmdbId}, Cidade: {Cidade}, Lat: {Lat}, Lon: {Lon}", 
+                tmdbId, cidade ?? "null", latitude?.ToString() ?? "null", longitude?.ToString() ?? "null");
             throw;
         }
     }
