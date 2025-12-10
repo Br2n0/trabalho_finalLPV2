@@ -268,7 +268,7 @@
             <div class="card shadow-lg border-0">
                 <div class="card-header bg-info text-white">
                     <h5 class="mb-0">
-                        <i class="fas fa-cloud-sun me-2"></i>Previsão do Tempo para @Model.CidadeReferencia
+                        <i class="fas fa-cloud-sun me-2"></i>Previsão do Tempo@(!string.IsNullOrEmpty(Model.CidadeReferencia) ? $" para {Model.CidadeReferencia}" : "")
                     </h5>
                 </div>
                 <div class="card-body">
