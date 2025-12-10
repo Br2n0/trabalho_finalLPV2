@@ -251,7 +251,7 @@ A branch main será usada como validação final. Ela deve:
 
 Para executar o projeto, é necessário configurar a API Key do TMDb. **Nunca commite segredos no repositório.**
 
-#### Opção 1: Arquivo de configuração local (Recomendado)
+#### Opção 1: Arquivo de configuração local 
 
 1. Copie o arquivo `appsettings.Development.json.example` para `appsettings.Development.json`
 2. Abra o arquivo `appsettings.Development.json` e adicione sua API Key no campo `TMDb:ApiKey`
