@@ -81,14 +81,27 @@ public class FilmeImportService : IFilmeImportService
             var filme = await ImportarFilmeAsync(detalhesTmdb);
 
             // Atualiza a localização, se fornecida
-            if (!string.IsNullOrEmpty(cidade) || latitude.HasValue || longitude.HasValue)
+            // Mesmo que cidade seja vazia, se tiver coordenadas, atualiza
+            if (!string.IsNullOrWhiteSpace(cidade) || latitude.HasValue || longitude.HasValue)
             {
-                filme.CidadeReferencia = cidade;
-                filme.Latitude = latitude;
-                filme.Longitude = longitude;
+                if (!string.IsNullOrWhiteSpace(cidade))
+                {
+                    filme.CidadeReferencia = cidade;
+                }
+                if (latitude.HasValue)
+                {
+                    filme.Latitude = latitude;
+                }
+                if (longitude.HasValue)
+                {
+                    filme.Longitude = longitude;
+                }
                 filme.DataAtualizacao = DateTime.Now;
 
                 await _filmeRepository.UpdateAsync(filme);
+                
+                _logger.LogInformation("Localização atualizada para filme {FilmeId}: Cidade={Cidade}, Lat={Lat}, Lon={Lon}", 
+                    filme.Id, filme.CidadeReferencia, filme.Latitude, filme.Longitude);
             }
 
             return filme;

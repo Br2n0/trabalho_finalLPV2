@@ -23,11 +23,17 @@ public class ServicoTmdbApi : IServicoTmdbApi
         _cache = cache;
         _logger = logger;
 
-        // para facilitar a execução do projeto sem necessidade de configuração manual.
-        // Em produção de verdade nao faria assim 
-        _apiKey = configuration["Tmdb:ApiKey"]
-                  ?? Environment.GetEnvironmentVariable("TMDB_API_KEY")
-                  ?? "af717ba3966e7fa1a21fd07060aac165";
+        // API Key deve ser configurada via appsettings.Development.json ou variável de ambiente
+        // Nunca commitar segredos no repositório
+        var apiKeyFromConfig = configuration["Tmdb:ApiKey"];
+        var apiKeyFromEnv = Environment.GetEnvironmentVariable("TMDB_API_KEY");
+        
+        _apiKey = !string.IsNullOrWhiteSpace(apiKeyFromConfig) ? apiKeyFromConfig
+                  : !string.IsNullOrWhiteSpace(apiKeyFromEnv) ? apiKeyFromEnv
+                  : throw new InvalidOperationException(
+                      "API Key do TMDb não configurada. " +
+                      "Configure via appsettings.Development.json ou variável de ambiente TMDB_API_KEY. " +
+                      "Veja o README para instruções detalhadas.");
     }
 
     public async Task<RespostaBuscaTmdb> BuscarFilmesAsync(string consulta, int pagina)

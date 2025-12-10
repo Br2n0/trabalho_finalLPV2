@@ -9,17 +9,44 @@ public class ServicoApiTempo : IServicoApiTempo
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IMemoryCache _cache;
+    private readonly IServicoGeocodificacao _geocodificacao;
     private readonly ILogger<ServicoApiTempo> _logger;
-    private const string BaseUrl = "https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&hourly=temperature_2m";
+    private const string BaseUrl = "https://api.open-meteo.com/v1/forecast";
 
     public ServicoApiTempo(
         IHttpClientFactory httpClientFactory,
         IMemoryCache cache,
+        IServicoGeocodificacao geocodificacao,
         ILogger<ServicoApiTempo> logger)
     {
         _httpClientFactory = httpClientFactory;
         _cache = cache;
+        _geocodificacao = geocodificacao;
         _logger = logger;
+    }
+    
+    public async Task<RespostaPrevisaoTempo?> ObterPrevisaoPorCidadeAsync(string cidade)
+    {
+        if (string.IsNullOrWhiteSpace(cidade))
+            return null;
+
+        try
+        {
+            var coordenadas = await _geocodificacao.ObterCoordenadasAsync(cidade);
+            
+            if (!coordenadas.HasValue)
+            {
+                _logger.LogWarning("Não foi possível obter coordenadas para a cidade: {Cidade}", cidade);
+                return null;
+            }
+
+            return await ObterPrevisaoDiariaAsync(coordenadas.Value.latitude, coordenadas.Value.longitude);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erro ao obter previsão do tempo para cidade: {Cidade}", cidade);
+            return null;
+        }
     }
 
     public async Task<RespostaPrevisaoTempo> ObterPrevisaoDiariaAsync(decimal latitude, decimal longitude)
@@ -32,13 +59,19 @@ public class ServicoApiTempo : IServicoApiTempo
             return cached!;
         }
 
-        var url = $"{BaseUrl}?latitude={latitude}&longitude={longitude}&daily=temperature_2m_max,temperature_2m_min&timezone=auto";
+        // Formata os números com ponto como separador decimal (padrão internacional)
+        var latStr = latitude.ToString("F6", System.Globalization.CultureInfo.InvariantCulture);
+        var lonStr = longitude.ToString("F6", System.Globalization.CultureInfo.InvariantCulture);
+        
+        var url = $"{BaseUrl}?latitude={latStr}&longitude={lonStr}&daily=temperature_2m_max,temperature_2m_min&timezone=auto";
         
         try
         {
             _logger.LogInformation("Obtendo previsão do tempo - URL: {Url}, Parâmetros: lat={Latitude}, lon={Longitude}", url, latitude, longitude);
             
             var client = _httpClientFactory.CreateClient();
+            client.Timeout = TimeSpan.FromSeconds(30); // Adiciona timeout
+            
             var response = await client.GetAsync(url);
             var content = await response.Content.ReadAsStringAsync();
             
@@ -61,6 +94,11 @@ public class ServicoApiTempo : IServicoApiTempo
         catch (ExcecaoApiTempo)
         {
             throw;
+        }
+        catch (TaskCanceledException ex)
+        {
+            _logger.LogError(ex, "Timeout ao obter previsão do tempo - URL: {Url}", url);
+            throw new ExcecaoApiTempo("Timeout ao obter previsão do tempo. Tente novamente mais tarde.", ex);
         }
         catch (Exception ex)
         {

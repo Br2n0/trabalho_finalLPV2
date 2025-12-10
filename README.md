@@ -244,3 +244,55 @@ A branch main será usada como validação final. Ela deve:
 - Código ASP.NET Core 8+ completo.
 - Persistência local funcional.
 - README com instruções.
+
+## 8. Configuração do Projeto
+
+### API Key do TMDb
+
+Para executar o projeto, é necessário configurar a API Key do TMDb. **Nunca commite segredos no repositório.**
+
+#### Opção 1: Arquivo de configuração local (Recomendado)
+
+1. Copie o arquivo `appsettings.Development.json.example` para `appsettings.Development.json`
+2. Abra o arquivo `appsettings.Development.json` e adicione sua API Key no campo `TMDb:ApiKey`
+3. O arquivo `appsettings.Development.json` está no `.gitignore` e não será commitado
+
+**Exemplo:**
+```json
+{
+  "TMDb": {
+    "ApiKey": "sua-chave-aqui"
+  }
+}
+```
+
+#### Opção 2: Variável de ambiente
+
+Configure a variável de ambiente `TMDB_API_KEY` com sua chave:
+
+**Windows (PowerShell):**
+```powershell
+$env:TMDB_API_KEY="sua-chave-aqui"
+```
+
+**Windows (CMD):**
+```cmd
+set TMDB_API_KEY=sua-chave-aqui
+```
+
+**Linux/Mac:**
+```bash
+export TMDB_API_KEY="sua-chave-aqui"
+```
+
+#### Como obter uma API Key
+
+1. Acesse https://www.themoviedb.org/
+2. Crie uma conta gratuita
+3. Vá em Configurações → API
+4. Solicite uma API Key (aprovada imediatamente para contas gratuitas)
+5. Use a API Key v3 (não a v4 Bearer Token)
+
+### Banco de Dados
+
+O projeto usa SQLite e o banco será criado automaticamente na primeira execução em `Data/CatalogoFilmes.db`.

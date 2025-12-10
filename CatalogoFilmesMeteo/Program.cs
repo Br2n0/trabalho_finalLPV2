@@ -3,13 +3,26 @@ using CatalogoFilmesMeteo.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configurar cultura para português
+var cultureInfo = new System.Globalization.CultureInfo("pt-BR");
+System.Globalization.CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options =>
+{
+    // Configurar validação em português
+    options.ModelValidatorProviders.Clear();
+})
+.AddViewLocalization()
+.AddDataAnnotationsLocalization();
+
 builder.Services.AddMemoryCache();
 builder.Services.AddHttpClient();
 
 // Registrar serviços de API externas
 builder.Services.AddScoped<IServicoTmdbApi, ServicoTmdbApi>();
+builder.Services.AddScoped<IServicoGeocodificacao, ServicoGeocodificacao>();
 builder.Services.AddScoped<IServicoApiTempo, ServicoApiTempo>();
 
 // Registrar repositório e serviços de negócio
