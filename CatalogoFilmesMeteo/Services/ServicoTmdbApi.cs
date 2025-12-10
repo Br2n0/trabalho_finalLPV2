@@ -215,6 +215,53 @@ public class ServicoTmdbApi : IServicoTmdbApi
         }
     }
 
+    public async Task<RespostaBuscaTmdb> BuscarFilmesPorGeneroAsync(int generoId, int pagina = 1)
+    {
+        var cacheKey = $"tmdb_genre_{generoId}_{pagina}";
+
+        if (_cache.TryGetValue(cacheKey, out RespostaBuscaTmdb? cached))
+        {
+            _logger.LogInformation("Cache hit para gênero: {GeneroId}, página: {Pagina}", generoId, pagina);
+            return cached!;
+        }
+
+        var url = $"{BaseUrl}/discover/movie?api_key={_apiKey}&with_genres={generoId}&page={pagina}&sort_by=popularity.desc";
+
+        try
+        {
+            _logger.LogInformation("Buscando filmes por gênero - URL: {Url}, Gênero: {GeneroId}, Página: {Pagina}", url, generoId, pagina);
+
+            var client = _httpClientFactory.CreateClient();
+            var response = await client.GetAsync(url);
+            var content = await response.Content.ReadAsStringAsync();
+
+            _logger.LogInformation("Resposta TMDb - Status: {StatusCode}, Data: {Data}", response.StatusCode, DateTime.Now);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError("Erro na API TMDb - Status: {StatusCode}, Resposta: {Resposta}", response.StatusCode, content);
+                throw new ExcecaoTmdbApi($"Erro ao buscar filmes por gênero: {response.StatusCode}", (int)response.StatusCode);
+            }
+
+            var resultado = JsonSerializer.Deserialize<RespostaBuscaTmdb>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+            if (resultado == null)
+                throw new ExcecaoTmdbApi("Resposta inválida da API TMDb");
+
+            _cache.Set(cacheKey, resultado, TimeSpan.FromMinutes(30));
+            return resultado;
+        }
+        catch (ExcecaoTmdbApi)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erro ao buscar filmes por gênero - URL: {Url}", url);
+            throw new ExcecaoTmdbApi($"Erro ao buscar filmes por gênero: {ex.Message}", ex);
+        }
+    }
+
     public string ConstruirUrlPoster(string? posterPath, string tamanho = "w500")
     {
         if (string.IsNullOrEmpty(posterPath))

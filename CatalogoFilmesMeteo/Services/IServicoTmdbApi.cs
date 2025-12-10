@@ -31,4 +31,9 @@ public interface IServicoTmdbApi
     /// Constrói a URL completa para um poster.
     /// </summary>
     string ConstruirUrlPoster(string? posterPath, string tamanho = "w500");
+
+    /// <summary>
+    /// Busca filmes por gênero usando o endpoint discover.
+    /// </summary>
+    Task<RespostaBuscaTmdb> BuscarFilmesPorGeneroAsync(int generoId, int pagina = 1);
 }

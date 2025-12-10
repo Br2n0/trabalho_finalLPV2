@@ -3,17 +3,8 @@ using CatalogoFilmesMeteo.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configurar cultura para português
-var cultureInfo = new System.Globalization.CultureInfo("pt-BR");
-System.Globalization.CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
-System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
-
 // Add services to the container.
-builder.Services.AddControllersWithViews(options =>
-{
-    // Configurar validação em português
-    options.ModelValidatorProviders.Clear();
-})
+builder.Services.AddControllersWithViews()
 .AddViewLocalization()
 .AddDataAnnotationsLocalization();
 
