@@ -5,8 +5,8 @@
       "Microsoft.AspNetCore": "Warning"
     }
   },
-  "Tmdb": {
-    "ApiKey": "colocar a chave aqui depois"
+  "TMDb": {
+    "ApiKey": "colocar sua chave aqui"
   }
 }
 

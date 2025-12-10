@@ -45,7 +45,7 @@ public class ExportService : IExportService
 
             using var csv = new CsvWriter(writer, config);
             
-            // Escreve os cabeçalhos (nomes das colunas)
+            //colunas do csv
             csv.WriteField("Id");
             csv.WriteField("TmdbId");
             csv.WriteField("Titulo");

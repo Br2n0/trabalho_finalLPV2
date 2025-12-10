@@ -11,4 +11,9 @@ public interface IServicoApiTempo
     /// Obtém a previsão diária do tempo para coordenadas específicas.
     /// </summary>
     Task<RespostaPrevisaoTempo> ObterPrevisaoDiariaAsync(decimal latitude, decimal longitude);
+    
+    /// <summary>
+    /// Obtém a previsão diária do tempo para uma cidade.
+    /// </summary>
+    Task<RespostaPrevisaoTempo?> ObterPrevisaoPorCidadeAsync(string cidade);
 }
