@@ -25,7 +25,7 @@ public class ServicoTmdbApi : IServicoTmdbApi
 
         // API Key deve ser configurada via appsettings.Development.json ou variável de ambiente
         // Nunca commitar segredos no repositório
-        var apiKeyFromConfig = configuration["Tmdb:ApiKey"];
+        var apiKeyFromConfig = configuration["TMDb:ApiKey"];
         var apiKeyFromEnv = Environment.GetEnvironmentVariable("TMDB_API_KEY");
         
         _apiKey = !string.IsNullOrWhiteSpace(apiKeyFromConfig) ? apiKeyFromConfig
@@ -132,6 +132,14 @@ public class ServicoTmdbApi : IServicoTmdbApi
 
     public async Task<RespostaImagensTmdb> ObterImagensFilmeAsync(int tmdbId)
     {
+        var cacheKey = $"tmdb_images_{tmdbId}";
+
+        if (_cache.TryGetValue(cacheKey, out RespostaImagensTmdb? cached))
+        {
+            _logger.LogInformation("Cache hit para imagens do filme: {Id}", tmdbId);
+            return cached!;
+        }
+
         var url = $"{BaseUrl}/movie/{tmdbId}/images?api_key={_apiKey}";
 
         try
@@ -155,6 +163,7 @@ public class ServicoTmdbApi : IServicoTmdbApi
             if (resultado == null)
                 throw new ExcecaoTmdbApi("Resposta inválida da API TMDb");
 
+            _cache.Set(cacheKey, resultado, TimeSpan.FromMinutes(10));
             return resultado;
         }
         catch (ExcecaoTmdbApi)
