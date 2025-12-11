@@ -174,3 +174,12 @@ FodyWeavers.xsd
 
 # User secrets - arquivos de configuração com dados sensíveis
 appsettings.Development.json
+**/appsettings.Development.json
+appsettings.*.json
+!appsettings.json
+!appsettings.*.json.example
+
+# Banco de dados SQLite (criado automaticamente na primeira execução)
+*.db
+**/Data/*.db
+!**/Data/.gitkeep
