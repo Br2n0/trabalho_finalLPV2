@@ -5,7 +5,7 @@ Trabalho Final da disciplina de Linguagem de Programação Visual II
 ## Documento de Requisitos do Sistema (DRS) — Catálogo de Filmes + Previsão do Tempo
 
 Integrações: TMDb + Open-Meteo + Nominatim API  
-Plataforma: ASP.NET Core 8+ (MVC)  
+Plataforma: ASP.NET Core 9.0 (MVC) 
 Equipes: Duplas  
 Versão: 1.5  
 Data: 26/11/2025
@@ -14,7 +14,7 @@ Data: 26/11/2025
 
 ### Plataforma e Requisitos
 
-- **Plataforma:** ASP.NET Core 8+ (MVC)
+- **Plataforma:** ASP.NET Core 9.0 (MVC) - [Download .NET 9.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
 - **Banco de Dados:** SQLite (criado automaticamente na primeira execução em `Data/CatalogoFilmes.db`)
 - **Integrações:** TMDb API + Open-Meteo API + Nominatim API
 
@@ -81,7 +81,7 @@ O projeto usa SQLite e o banco será criado automaticamente na primeira execuç�
 
 ## 2. Visão Geral
 
-Desenvolver uma aplicação MVC em ASP.NET Core 8+ que:
+Desenvolver uma aplicação MVC em ASP.NET Core 9.0 que:
 
 - Pesquise filmes no TMDb,
 - Importe títulos selecionados para uma base local,
@@ -240,7 +240,7 @@ Exibir exatamente os resultados e numeração retornados pela API.
 
 A entrega só será aceita se TODOS os itens estiverem presentes:
 
-- ASP.NET Core 8+ funcionando.
+- ASP.NET Core 9.0 funcionando.
 - CRUD completo de filmes.
 - Integração TMDb: /search/movie, /movie/{id}, /movie/{id}/images, /configuration.
 - Integração Open-Meteo funcional na tela de detalhes.
@@ -310,6 +310,6 @@ A branch main será usada como validação final. Ela deve:
 
 - Repositório Git com branches individuais.
 - PRs (mínimo 3 por aluno).
-- Código ASP.NET Core 8+ completo.
+- Código ASP.NET Core 9.0 completo.
 - Persistência local funcional.
 - README com instruções.
