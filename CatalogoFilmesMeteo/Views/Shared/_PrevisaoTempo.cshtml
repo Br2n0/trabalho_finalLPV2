@@ -1,102 +1,93 @@
 @model CatalogoFilmesMeteo.Models.DTOs.RespostaPrevisaoTempo
 
-<div class="card shadow border-0">
-    <div class="card-header bg-info text-white">
-        <h5 class="mb-0">
-            <i class="fas fa-cloud-sun me-2"></i>Previsão do Tempo
-        </h5>
-    </div>
-    <div class="card-body">
-        @if (Model.Diario != null && Model.Diario.Datas.Any())
-        {
-            <div class="alert alert-light border">
-                <div class="row align-items-center">
-                    <div class="col-auto">
-                        <i class="fas fa-map-marker-alt fa-2x text-info"></i>
-                    </div>
-                    <div class="col">
-                        <p class="mb-1"><strong>Coordenadas:</strong></p>
-                        <p class="mb-0 text-muted small">
-                            Latitude: @Model.Latitude.ToString("F6") |
-                            Longitude: @Model.Longitude.ToString("F6")
-                        </p>
-                        <p class="mb-0 text-muted small">
-                            <i class="fas fa-clock me-1"></i>Fuso horário: @Model.FusoHorario
-                        </p>
-                    </div>
-                </div>
+@if (Model.Diario != null && Model.Diario.Datas.Any())
+{
+    <div class="alert alert-light border">
+        <div class="row align-items-center">
+            <div class="col-auto">
+                <i class="fas fa-map-marker-alt fa-2x text-info"></i>
             </div>
+            <div class="col">
+                <p class="mb-1"><strong>Coordenadas:</strong></p>
+                <p class="mb-0 text-muted small">
+                    Latitude: @Model.Latitude.ToString("F6") |
+                    Longitude: @Model.Longitude.ToString("F6")
+                </p>
+                <p class="mb-0 text-muted small">
+                    <i class="fas fa-clock me-1"></i>Fuso horário: @Model.FusoHorario
+                </p>
+            </div>
+        </div>
+    </div>
 
-            <div class="row g-3">
-                @for (int i = 0; i < Math.Min(7, Model.Diario.Datas.Count); i++)
-                {
-                    var data = DateTime.Parse(Model.Diario.Datas[i]);
-                    var tempMax = Model.Diario.TemperaturaMaxima[i];
-                    var tempMin = Model.Diario.TemperaturaMinima[i];
-                    var isToday = data.Date == DateTime.Today;
+    <div class="row g-3">
+        @for (int i = 0; i < Math.Min(7, Model.Diario.Datas.Count); i++)
+        {
+            var data = DateTime.Parse(Model.Diario.Datas[i]);
+            var tempMax = Model.Diario.TemperaturaMaxima[i];
+            var tempMin = Model.Diario.TemperaturaMinima[i];
+            var isToday = data.Date == DateTime.Today;
 
-                    <div class="col-md-6 col-lg-4">
-                        <div class="card @(isToday ? "border-primary" : "") h-100">
-                            <div class="card-body text-center">
-                                @if (isToday)
-                                {
-                                    <span class="badge bg-primary mb-2">Hoje</span>
-                                }
+            <div class="col-md-6 col-lg-4">
+                <div class="card @(isToday ? "border-primary" : "") h-100">
+                    <div class="card-body text-center">
+                        @if (isToday)
+                        {
+                            <span class="badge bg-primary mb-2">Hoje</span>
+                        }
 
-                                <h6 class="card-subtitle mb-2 text-muted">
-                                    <i class="fas fa-calendar me-1"></i>
-                                    @data.ToString("dd/MM/yyyy")
-                                </h6>
-                                <p class="mb-1 small text-muted">
-                                    @data.ToString("dddd", new System.Globalization.CultureInfo("pt-BR"))
-                                </p>
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            <i class="fas fa-calendar me-1"></i>
+                            @data.ToString("dd/MM/yyyy")
+                        </h6>
+                        <p class="mb-1 small text-muted">
+                            @data.ToString("dddd", new System.Globalization.CultureInfo("pt-BR"))
+                        </p>
 
-                                <div class="my-3">
-                                    <i class="fas fa-sun fa-3x text-warning"></i>
+                        <div class="my-3">
+                            <i class="fas fa-sun fa-3x text-warning"></i>
+                        </div>
+
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <div class="d-flex flex-column">
+                                    <span class="text-danger fw-bold fs-4">
+                                        @(tempMax.HasValue ? $"{tempMax.Value:F1}°C" : "N/A")
+                                    </span>
+                                    <small class="text-muted">
+                                        <i class="fas fa-arrow-up"></i> Máxima
+                                    </small>
                                 </div>
-
-                                <div class="row text-center">
-                                    <div class="col-6">
-                                        <div class="d-flex flex-column">
-                                            <span class="text-danger fw-bold fs-4">
-                                                @(tempMax.HasValue ? $"{tempMax.Value:F1}°C" : "N/A")
-                                            </span>
-                                            <small class="text-muted">
-                                                <i class="fas fa-arrow-up"></i> Máxima
-                                            </small>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="d-flex flex-column">
-                                            <span class="text-primary fw-bold fs-4">
-                                                @(tempMin.HasValue ? $"{tempMin.Value:F1}°C" : "N/A")
-                                            </span>
-                                            <small class="text-muted">
-                                                <i class="fas fa-arrow-down"></i> Mínima
-                                            </small>
-                                        </div>
-                                    </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="d-flex flex-column">
+                                    <span class="text-primary fw-bold fs-4">
+                                        @(tempMin.HasValue ? $"{tempMin.Value:F1}°C" : "N/A")
+                                    </span>
+                                    <small class="text-muted">
+                                        <i class="fas fa-arrow-down"></i> Mínima
+                                    </small>
                                 </div>
                             </div>
                         </div>
                     </div>
-                }
-            </div>
-
-            <div class="alert alert-info mt-3 mb-0">
-                <i class="fas fa-info-circle me-2"></i>
-                <small>
-                    Dados fornecidos pela API Open-Meteo. Previsão para os próximos @Math.Min(7, Model.Diario.Datas.Count)
-                    dias.
-                </small>
-            </div>
-        }
-        else
-        {
-            <div class="alert alert-warning text-center" role="alert">
-                <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
-                <p class="mb-0">Não foi possível obter a previsão do tempo para esta localização.</p>
+                </div>
             </div>
         }
     </div>
-</div>
+
+    <div class="alert alert-info mt-3 mb-0">
+        <i class="fas fa-info-circle me-2"></i>
+        <small>
+            Dados fornecidos pela API Open-Meteo. Previsão para os próximos @Math.Min(7, Model.Diario.Datas.Count)
+            dias.
+        </small>
+    </div>
+}
+else
+{
+    <div class="alert alert-warning text-center" role="alert">
+        <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
+        <p class="mb-0">Não foi possível obter a previsão do tempo para esta localização.</p>
+    </div>
+}
