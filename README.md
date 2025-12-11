@@ -4,13 +4,82 @@ Trabalho Final da disciplina de Linguagem de Programação Visual II
 
 ## Documento de Requisitos do Sistema (DRS) — Catálogo de Filmes + Previsão do Tempo
 
-Integrações: TMDb + Open-Meteo
-Plataforma: ASP.NET Core 8+ (MVC)
-Equipes: Duplas
-Versão: 1.5
+Integrações: TMDb + Open-Meteo + Nominatim API  
+Plataforma: ASP.NET Core 8+ (MVC)  
+Equipes: Duplas  
+Versão: 1.5  
 Data: 26/11/2025
 
-## 1. Visão Geral
+## 1. Configuração do Projeto
+
+### Plataforma e Requisitos
+
+- **Plataforma:** ASP.NET Core 8+ (MVC)
+- **Banco de Dados:** SQLite (criado automaticamente na primeira execução em `Data/CatalogoFilmes.db`)
+- **Integrações:** TMDb API + Open-Meteo API + Nominatim API
+
+
+### Como Executar o Projeto
+
+1. Clone o repositório
+2. Configure a API Key do TMDb (veja instruções abaixo)
+3. Execute o projeto:
+   ```bash
+   dotnet run
+   ```
+   ou através do IDE (Visual Studio, Rider, etc.)
+
+### API Key do TMDb
+
+Para executar o projeto, é necessário configurar a API Key do TMDb. **Nunca commite segredos no repositório.**
+
+#### Opção 1: Arquivo de configuração local (Recomendado)
+
+1. Copie o arquivo `appsettings.Development.json.example` para `appsettings.Development.json`
+2. Abra o arquivo `appsettings.Development.json` e adicione sua API Key no campo `TMDb:ApiKey`
+3. O arquivo `appsettings.Development.json` está no `.gitignore` e não será commitado
+
+**Exemplo:**
+```json
+{
+  "TMDb": {
+    "ApiKey": "sua-chave-aqui"
+  }
+}
+```
+
+#### Opção 2: Variável de ambiente
+
+Configure a variável de ambiente `TMDB_API_KEY` com sua chave:
+
+**Windows (PowerShell):**
+```powershell
+$env:TMDB_API_KEY="sua-chave-aqui"
+```
+
+**Windows (CMD):**
+```cmd
+set TMDB_API_KEY=sua-chave-aqui
+```
+
+**Linux/Mac:**
+```bash
+export TMDB_API_KEY="sua-chave-aqui"
+```
+
+#### Como obter uma API Key
+
+1. Acesse https://www.themoviedb.org/
+2. Crie uma conta gratuita
+3. Vá em Configurações → API
+4. Solicite uma API Key (aprovada imediatamente para contas gratuitas)
+5. Use a API Key v3 (não a v4 Bearer Token)
+
+### Banco de Dados
+
+O projeto usa SQLite e o banco será criado automaticamente na primeira execução em `Data/CatalogoFilmes.db`.
+
+## 2. Visão Geral
 
 Desenvolver uma aplicação MVC em ASP.NET Core 8+ que:
 
@@ -23,7 +92,7 @@ Desenvolver uma aplicação MVC em ASP.NET Core 8+ que:
 
 O projeto também exige workflow Git profissional: branches individuais e PRs obrigatórios.
 
-## 2. Escopo do Sistema
+## 3. Escopo do Sistema
 
 A aplicação deverá:
 
@@ -37,7 +106,7 @@ A aplicação deverá:
 - Usar partial views reutilizáveis.
 - Seguir rigorosamente o fluxo Git/PRs.
 
-## 3. Requisitos Funcionais (RF)
+## 4. Requisitos Funcionais (RF)
 
 ### RF01 — Entidade Filme (obrigatório)
 
@@ -167,7 +236,7 @@ Utilizar o parâmetro page da API.
 
 Exibir exatamente os resultados e numeração retornados pela API.
 
-## 4. Hard Requirements (Obrigatórios)
+## 5. Hard Requirements (Obrigatórios)
 
 A entrega só será aceita se TODOS os itens estiverem presentes:
 
@@ -184,7 +253,7 @@ A entrega só será aceita se TODOS os itens estiverem presentes:
 - Workflow Git obrigatório (branches individuais + PRs).
 - README completo.
 
-## 5. Critérios de Aceitação
+## 6. Critérios de Aceitação
 
 - Busca TMDb funcionando com paginação.
 - Importação salva filme localmente com dados completos.
@@ -196,9 +265,9 @@ A entrega só será aceita se TODOS os itens estiverem presentes:
 - Branch main executa sem ajustes.
 - Cada aluno possui 3 PRs aprovados ou mais.
 
-## 6. Workflow Git / PRs (obrigatório)
+## 7. Workflow Git / PRs (obrigatório)
 
-### 6.1 — Branches Individuais
+### 7.1 — Branches Individuais
 
 Cada aluno deve trabalhar apenas em sua própria branch, seguindo o padrão:
 
@@ -207,7 +276,7 @@ ou
 
 feature/<matricula>-<descricao>
 
-### 6.2 — Pull Requests (PRs)
+### 7.2 — Pull Requests (PRs)
 
 Toda alteração deve ser integrada via PR para main.
 
@@ -220,14 +289,14 @@ Cada PR deve conter:
 - arquivos alterados
 - o que foi implementado
 
-### 6.3 — Mínimo obrigatório de PRs
+### 7.3 — Mínimo obrigatório de PRs
 
 Cada aluno deve ter no mínimo 3 PRs aprovados no repositório.
 
 PRs aceitos: features, correções, documentação, refatorações.
 PRs que NÃO contam: vazios, triviais ou automáticos.
 
-### 6.4 — Entrega final
+### 7.4 — Entrega final
 
 A branch main será usada como validação final. Ela deve:
 
@@ -237,62 +306,10 @@ A branch main será usada como validação final. Ela deve:
 - ter persistência funcionando
 - estar estável e limpa
 
-## 7. Entregáveis
+## 8. Entregáveis
 
 - Repositório Git com branches individuais.
 - PRs (mínimo 3 por aluno).
 - Código ASP.NET Core 8+ completo.
 - Persistência local funcional.
 - README com instruções.
-
-## 8. Configuração do Projeto
-
-### API Key do TMDb
-
-Para executar o projeto, é necessário configurar a API Key do TMDb. **Nunca commite segredos no repositório.**
-
-#### Opção 1: Arquivo de configuração local (Recomendado)
-
-1. Copie o arquivo `appsettings.Development.json.example` para `appsettings.Development.json`
-2. Abra o arquivo `appsettings.Development.json` e adicione sua API Key no campo `TMDb:ApiKey`
-3. O arquivo `appsettings.Development.json` está no `.gitignore` e não será commitado
-
-**Exemplo:**
-```json
-{
-  "TMDb": {
-    "ApiKey": "sua-chave-aqui"
-  }
-}
-```
-
-#### Opção 2: Variável de ambiente
-
-Configure a variável de ambiente `TMDB_API_KEY` com sua chave:
-
-**Windows (PowerShell):**
-```powershell
-$env:TMDB_API_KEY="sua-chave-aqui"
-```
-
-**Windows (CMD):**
-```cmd
-set TMDB_API_KEY=sua-chave-aqui
-```
-
-**Linux/Mac:**
-```bash
-export TMDB_API_KEY="sua-chave-aqui"
-```
-
-#### Como obter uma API Key
-
-1. Acesse https://www.themoviedb.org/
-2. Crie uma conta gratuita
-3. Vá em Configurações → API
-4. Solicite uma API Key (aprovada imediatamente para contas gratuitas)
-5. Use a API Key v3 (não a v4 Bearer Token)
-
-### Banco de Dados
-
-O projeto usa SQLite e o banco será criado automaticamente na primeira execução em `Data/CatalogoFilmes.db`.
